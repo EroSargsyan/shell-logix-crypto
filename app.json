@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.shell_logix"
     },
     "web": {
       "bundler": "metro",
