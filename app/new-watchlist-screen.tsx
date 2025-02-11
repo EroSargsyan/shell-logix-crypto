@@ -8,18 +8,24 @@ import {
   SafeAreaView,
   FlatList,
   Image,
+  Modal,
 } from 'react-native';
 import { router } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from './redux/store';
 import { clearTempWatchlist } from './redux/slices/tempWatchlistsSlice';
 import { createWatchlist } from './redux/slices/watchlistsSlice';
+import { availableIcons } from './constants/Icons';
+import IconSelectionModal from './components/ui/modal/IconSelectionModal';
 
 export default function NewWatchlistScreen() {
   const dispatch = useDispatch<AppDispatch>();
-  const { icon, selectedCoins } = useSelector((state: RootState) => state.tempWatchlists);
+  const { selectedCoins } = useSelector((state: RootState) => state.tempWatchlists);
 
+  const [selectedIcon, setSelectedIcon] = useState(availableIcons[0]);
   const [watchlistName, setWatchlistName] = useState('');
+  const [isIconModalVisible, setIconModalVisible] = useState(false);
 
   const handleNameChange = (value: string) => {
     setWatchlistName(value);
@@ -34,13 +40,12 @@ export default function NewWatchlistScreen() {
       createWatchlist({
         id: Date.now().toString(),
         name: watchlistName,
-        icon,
+        icon: selectedIcon,
         coins: selectedCoins,
       }),
     );
 
     dispatch(clearTempWatchlist());
-
     router.back();
   };
 
@@ -51,6 +56,11 @@ export default function NewWatchlistScreen() {
 
   const handleAddCoinsPress = () => {
     router.push('/add-coins-screen');
+  };
+
+  const handleIconSelect = (iconName: string) => {
+    setSelectedIcon(iconName as typeof selectedIcon);
+    setIconModalVisible(false);
   };
 
   return (
@@ -66,7 +76,9 @@ export default function NewWatchlistScreen() {
       </View>
 
       <View style={styles.body}>
-        <Text style={styles.emoji}>{icon}</Text>
+        <Pressable onPress={() => setIconModalVisible(true)} style={styles.avatarContainer}>
+          <Ionicons name={selectedIcon} size={60} color="#8e44ad" />
+        </Pressable>
 
         <TextInput
           style={styles.nameInput}
@@ -96,12 +108,20 @@ export default function NewWatchlistScreen() {
           <Text style={styles.addCoinsText}>+ Add Coins</Text>
         </Pressable>
       </View>
+
+      <IconSelectionModal
+        visible={isIconModalVisible}
+        selectedIcon={selectedIcon}
+        onSelectIcon={handleIconSelect}
+        onClose={() => setIconModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
+
   header: {
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -109,11 +129,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   cancelText: { fontSize: 16, color: '#8e44ad' },
+
   title: { fontSize: 16, fontWeight: '600', color: '#000' },
+
   createText: { fontSize: 16, color: '#8e44ad' },
+
   body: { flex: 1, padding: 24, alignItems: 'center' },
-  emoji: { fontSize: 60, marginBottom: 16 },
+
+  avatarContainer: {
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eee',
+    borderRadius: 40,
+    marginBottom: 16,
+  },
+
   nameInput: {
     width: '80%',
     padding: 12,
@@ -123,16 +157,19 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     fontSize: 16,
   },
+
   addCoinsBtn: {
     padding: 12,
     borderRadius: 8,
     backgroundColor: '#eee',
   },
+
   addCoinsText: {
     fontSize: 16,
     color: '#8e44ad',
     fontWeight: '500',
   },
+
   coinRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -141,7 +178,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
     width: 300,
   },
+
   coinImage: { width: 32, height: 32, marginRight: 12, borderRadius: 16 },
+
   symbol: { fontSize: 16, fontWeight: '500' },
+
   name: { fontSize: 12, color: '#666' },
 });
