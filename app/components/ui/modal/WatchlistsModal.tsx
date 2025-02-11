@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, Modal, Pressable, StyleSheet, FlatList, Image } from 'react-native';
 import { IWatchlistItem, IWatchlistModalProps } from '@/app/types/types';
 
@@ -13,16 +12,14 @@ const WatchlistsModal: React.FC<IWatchlistModalProps> = ({
 }) => {
   const renderItem = ({ item }: { item: IWatchlistItem }) => {
     const isSelected = item.id === selectedWatchlistId;
-
     return (
       <Pressable style={styles.itemContainer} onPress={() => onSelectWatchlist(item.id)}>
-        {/* Icon/emoji on the left */}
         <Image source={item.icon} style={styles.icon} />
         <View style={{ flex: 1 }}>
           <Text style={styles.itemTitle}>{item.name}</Text>
-          <Text style={styles.itemSubtitle}>{item.coinCount}+ Coins</Text>
+          <Text style={styles.itemSubtitle}>{item.coinCount} Coins</Text>
         </View>
-        {/* Purple checkmark if selected */}
+
         {isSelected && <Text style={styles.checkmark}>✔</Text>}
       </Pressable>
     );
@@ -30,11 +27,8 @@ const WatchlistsModal: React.FC<IWatchlistModalProps> = ({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      {/* Close area outside modal */}
-
       <View style={styles.modalOverlay}>
         <Pressable style={styles.overlayTouchable} onPress={onClose} />
-        {/* The bottom sheet container */}
         <View style={styles.modalContainer}>
           {/* Header row */}
           <View style={styles.headerRow}>
@@ -44,7 +38,6 @@ const WatchlistsModal: React.FC<IWatchlistModalProps> = ({
             </Pressable>
           </View>
 
-          {/* Watchlists list */}
           <FlatList
             data={watchlists}
             keyExtractor={(item) => item.id}
@@ -52,7 +45,6 @@ const WatchlistsModal: React.FC<IWatchlistModalProps> = ({
             style={styles.flatList}
           />
 
-          {/* "New Watchlist" button */}
           <Pressable onPress={onCreateNew} style={styles.newWatchlistButton}>
             <Text style={styles.newWatchlistText}>+ New Watchlist</Text>
           </Pressable>
@@ -65,9 +57,6 @@ const WatchlistsModal: React.FC<IWatchlistModalProps> = ({
 export default WatchlistsModal;
 
 const styles = StyleSheet.create({
-  /**
-   * Dark overlay behind the sheet
-   */
   modalOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -76,25 +65,14 @@ const styles = StyleSheet.create({
   overlayTouchable: {
     flex: 1,
   },
-  /**
-   * Bottom sheet container
-   */
   modalContainer: {
     backgroundColor: '#fff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingVertical: 16,
     paddingHorizontal: 20,
-    maxHeight: '50%', // or adjust to suit your design
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 10,
+    maxHeight: '50%',
   },
-  /**
-   * Header
-   */
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -110,16 +88,10 @@ const styles = StyleSheet.create({
     color: '#8e44ad',
     fontWeight: '500',
   },
-  /**
-   * FlatList
-   */
   flatList: {
     flexGrow: 0,
     marginBottom: 8,
   },
-  /**
-   * Each watchlist item row
-   */
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -146,9 +118,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 8,
   },
-  /**
-   * "New Watchlist" button row
-   */
   newWatchlistButton: {
     paddingVertical: 10,
   },
