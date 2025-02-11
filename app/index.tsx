@@ -42,7 +42,7 @@ export default function MainScreen() {
     setModalVisible(false);
 
     if (selectedWatchlist?.id === watchlistId) {
-      setSelectedWatchlist(watchlists.length > 1 ? watchlists[0] : null);
+      setSelectedWatchlist(watchlists.length - 1 ? watchlists[0] : null);
     }
   };
 
