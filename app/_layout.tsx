@@ -36,6 +36,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="new-watchlist-screen" options={{ headerShown: false }} />
             <Stack.Screen name="add-coins-screen" options={{ headerShown: false }} />
+            <Stack.Screen name="edit-watchlist-screen" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
           </Stack>
           <StatusBar style="auto" />
