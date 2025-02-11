@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, Modal, Pressable, StyleSheet, FlatList, Image } from 'react-native';
-import { WatchlistItem, WatchlistModalProps } from '@/app/types/types';
+import { IWatchlistItem, IWatchlistModalProps } from '@/app/types/types';
 
-const WatchlistsModal: React.FC<WatchlistModalProps> = ({
+const WatchlistsModal: React.FC<IWatchlistModalProps> = ({
   visible,
   onClose,
   watchlists,
@@ -11,7 +11,7 @@ const WatchlistsModal: React.FC<WatchlistModalProps> = ({
   onCreateNew,
   onEditPress,
 }) => {
-  const renderItem = ({ item }: { item: WatchlistItem }) => {
+  const renderItem = ({ item }: { item: IWatchlistItem }) => {
     const isSelected = item.id === selectedWatchlistId;
 
     return (
