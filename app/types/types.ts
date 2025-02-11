@@ -27,16 +27,16 @@ export interface ICoin {
   max_supply: number | null;
   ath: number;
   ath_change_percentage: number;
-  ath_date: string; // ISO date string
+  ath_date: string;
   atl: number;
   atl_change_percentage: number;
-  atl_date: string; // ISO date string
+  atl_date: string;
   roi: {
     times: number;
     currency: string;
     percentage: number;
   } | null;
-  last_updated: string; // ISO date string
+  last_updated: string;
 }
 
 export interface ICoinsState {
@@ -53,6 +53,7 @@ export interface IWatchlistsModalProps {
   onSelectWatchlist: (id: string) => void;
   onCreateNew: () => void;
   onEditWatchlist: (id: string) => void;
+  onDeleteWatchlist: (id: string) => void;
 }
 
 export interface IWatchlist {

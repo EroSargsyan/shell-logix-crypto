@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from './redux/store';
 import { getCoinsMarkets } from './redux/slices/coinsSlice';
+import { deleteWatchlist } from './redux/slices/watchlistsSlice';
 import WatchlistsModal from './components/ui/modal/WatchlistsModal';
 import { ICoin, IWatchlist } from '@/app/types/types';
 
@@ -29,6 +30,20 @@ export default function MainScreen() {
   const handleOnCreateNew = () => {
     setModalVisible(false);
     router.push('/new-watchlist-screen');
+  };
+
+  const handleEditWatchlist = (watchlistId: string) => {
+    setModalVisible(false);
+    router.push(`/edit-watchlist-screen?watchlistId=${watchlistId}`);
+  };
+
+  const handleDeleteWatchlist = (watchlistId: string) => {
+    dispatch(deleteWatchlist(watchlistId));
+    setModalVisible(false);
+
+    if (selectedWatchlist?.id === watchlistId) {
+      setSelectedWatchlist(watchlists.length > 1 ? watchlists[0] : null);
+    }
   };
 
   useEffect(() => {
@@ -73,10 +88,8 @@ export default function MainScreen() {
         selectedWatchlistId={selectedWatchlist?.id}
         onSelectWatchlist={handleSelectWatchlist}
         onCreateNew={handleOnCreateNew}
-        onEditWatchlist={(id) => {
-          setModalVisible(false);
-          router.push(`/edit-watchlist-screen?watchlistId=${id}`);
-        }}
+        onEditWatchlist={handleEditWatchlist}
+        onDeleteWatchlist={handleDeleteWatchlist}
       />
     </SafeAreaView>
   );

@@ -48,8 +48,11 @@ const watchlistsSlice = createSlice({
         watchlist.coinCount = newCoins.length;
       }
     },
+    deleteWatchlist: (state, action: PayloadAction<string>) => {
+      state.items = state.items.filter((watchlist) => watchlist.id !== action.payload);
+    },
   },
 });
 
-export const { createWatchlist, updateWatchlist } = watchlistsSlice.actions;
+export const { createWatchlist, updateWatchlist, deleteWatchlist } = watchlistsSlice.actions;
 export default watchlistsSlice.reducer;

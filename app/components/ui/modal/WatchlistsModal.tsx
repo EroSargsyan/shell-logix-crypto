@@ -1,4 +1,4 @@
-import { View, Text, Modal, Pressable, StyleSheet, FlatList, Image } from 'react-native';
+import { View, Text, Modal, Pressable, StyleSheet, FlatList, Image, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { IWatchlistItem, IWatchlistsModalProps } from '@/app/types/types';
 
@@ -10,7 +10,20 @@ export default function WatchlistsModal({
   onSelectWatchlist,
   onCreateNew,
   onEditWatchlist,
+  onDeleteWatchlist,
 }: IWatchlistsModalProps) {
+  const handleDeletePress = (watchlistId: string) => {
+    Alert.alert(
+      'Delete Watchlist',
+      'Are you sure you want to delete this watchlist?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => onDeleteWatchlist(watchlistId) },
+      ],
+      { cancelable: true },
+    );
+  };
+
   const renderItem = ({ item }: { item: IWatchlistItem }) => {
     const isSelected = item.id === selectedWatchlistId;
     return (
@@ -23,8 +36,13 @@ export default function WatchlistsModal({
           </View>
           {isSelected && <Text style={styles.checkmark}>✔</Text>}
         </Pressable>
-        <Pressable style={styles.editIcon} onPress={() => onEditWatchlist(item.id)}>
+
+        <Pressable style={styles.iconButton} onPress={() => onEditWatchlist(item.id)}>
           <Ionicons name="create-outline" size={20} color="#8e44ad" />
+        </Pressable>
+
+        <Pressable style={styles.iconButton} onPress={() => handleDeletePress(item.id)}>
+          <Ionicons name="trash-outline" size={20} color="red" />
         </Pressable>
       </View>
     );
@@ -95,7 +113,7 @@ const styles = StyleSheet.create({
   itemTitle: { fontSize: 15, fontWeight: '500', color: '#000' },
   itemSubtitle: { fontSize: 13, color: '#777' },
   checkmark: { fontSize: 18, color: '#8e44ad', fontWeight: '600', marginLeft: 8 },
-  editIcon: { padding: 8 },
+  iconButton: { padding: 8 },
   newWatchlistButton: { paddingVertical: 10 },
   newWatchlistText: { fontSize: 16, color: '#8e44ad', fontWeight: '600' },
 });
