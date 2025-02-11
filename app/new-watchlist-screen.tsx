@@ -1,31 +1,60 @@
+import { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  SafeAreaView,
+  FlatList,
+  Image,
+} from 'react-native';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, SafeAreaView } from 'react-native';
-// import { useDispatch } from 'react-redux'
-// import { createWatchlist } from '../redux/slices/watchlistSlice'
-// etc.
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from './redux/store';
+import { clearTempWatchlist } from './redux/slices/tempWatchlistsSlice';
+import { createWatchlist } from './redux/slices/watchlistsSlice';
 
 export default function NewWatchlistScreen() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { icon, selectedCoins } = useSelector((state: RootState) => state.tempWatchlists);
+
   const [watchlistName, setWatchlistName] = useState('');
-  // const dispatch = useDispatch()
+
+  const handleNameChange = (value: string) => {
+    setWatchlistName(value);
+  };
 
   const handleCreatePress = () => {
-    if (!watchlistName.trim()) return;
-    // dispatch(createWatchlist({ name: watchlistName, icon: '🦄', coins: [] }))
-    // navigation.goBack()
+    if (!watchlistName.trim()) {
+      return;
+    }
+
+    dispatch(
+      createWatchlist({
+        id: Date.now().toString(),
+        name: watchlistName,
+        icon,
+        coins: selectedCoins,
+      }),
+    );
+
+    dispatch(clearTempWatchlist());
+
+    router.back();
+  };
+
+  const handleCancelPress = () => {
+    dispatch(clearTempWatchlist());
+    router.back();
   };
 
   const handleAddCoinsPress = () => {
     router.push('/add-coins-screen');
   };
 
-  const handleCancelPress = () => {
-    router.back();
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={handleCancelPress}>
           <Text style={styles.cancelText}>Cancel</Text>
@@ -36,20 +65,33 @@ export default function NewWatchlistScreen() {
         </Pressable>
       </View>
 
-      {/* Body */}
       <View style={styles.body}>
-        {/* Icon / Emoji */}
-        <Text style={styles.emoji}>🦄</Text>
+        <Text style={styles.emoji}>{icon}</Text>
 
-        {/* Watchlist Name Input */}
         <TextInput
           style={styles.nameInput}
           placeholder="Watchlist Name"
           value={watchlistName}
-          onChangeText={setWatchlistName}
+          onChangeText={handleNameChange}
         />
 
-        {/* Add Coins Button */}
+        {selectedCoins.length > 0 && (
+          <FlatList
+            style={{ marginTop: 16 }}
+            data={selectedCoins}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.coinRow}>
+                <Image source={{ uri: item.image }} style={styles.coinImage} />
+                <View>
+                  <Text style={styles.symbol}>{item.symbol.toUpperCase()}</Text>
+                  <Text style={styles.name}>{item.name}</Text>
+                </View>
+              </View>
+            )}
+          />
+        )}
+
         <Pressable style={styles.addCoinsBtn} onPress={handleAddCoinsPress}>
           <Text style={styles.addCoinsText}>+ Add Coins</Text>
         </Pressable>
@@ -59,10 +101,7 @@ export default function NewWatchlistScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
   header: {
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -70,28 +109,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  cancelText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
-  },
-  createText: {
-    fontSize: 16,
-    color: '#8e44ad',
-  },
-  body: {
-    flex: 1,
-    padding: 24,
-    alignItems: 'center',
-  },
-  emoji: {
-    fontSize: 60,
-    marginBottom: 16,
-  },
+  cancelText: { fontSize: 16, color: '#666' },
+  title: { fontSize: 16, fontWeight: '600', color: '#000' },
+  createText: { fontSize: 16, color: '#8e44ad' },
+  body: { flex: 1, padding: 24, alignItems: 'center' },
+  emoji: { fontSize: 60, marginBottom: 16 },
   nameInput: {
     width: '80%',
     padding: 12,
@@ -100,7 +122,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 24,
     fontSize: 16,
-    textAlign: 'center',
   },
   addCoinsBtn: {
     padding: 12,
@@ -112,4 +133,15 @@ const styles = StyleSheet.create({
     color: '#8e44ad',
     fontWeight: '500',
   },
+  coinRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#ddd',
+    width: 300,
+  },
+  coinImage: { width: 32, height: 32, marginRight: 12, borderRadius: 16 },
+  symbol: { fontSize: 16, fontWeight: '500' },
+  name: { fontSize: 12, color: '#666' },
 });
