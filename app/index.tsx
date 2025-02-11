@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Button, FlatList } from 'react-native';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppDispatch, RootState } from './redux/store';
 import { getCoinsMarkets } from './redux/slices/coinsSlice';
 import { deleteWatchlist } from './redux/slices/watchlistsSlice';
@@ -65,7 +66,11 @@ export default function MainScreen() {
 
       {selectedWatchlist ? (
         <View style={styles.listArea}>
-          <Text style={styles.listTitle}>{selectedWatchlist.name}</Text>
+          <View style={styles.watchlistHeader}>
+            <Ionicons name={selectedWatchlist.icon as any} size={40} color="#8e44ad" />
+            <Text style={styles.listTitle}>{selectedWatchlist.name}</Text>
+          </View>
+
           <FlatList
             data={displayedCoins}
             keyExtractor={(coin) => coin.id}
@@ -111,6 +116,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     textAlign: 'center',
   },
+
+  watchlistHeader: {
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
   placeholder: {
     flex: 1,
     alignItems: 'center',
