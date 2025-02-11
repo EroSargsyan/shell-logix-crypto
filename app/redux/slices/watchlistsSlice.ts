@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ICoin, IWatchlistsState } from '@/app/types/types';
+import { ICoin, IWatchlist, IWatchlistsState } from '@/app/types/types';
 
 const initialState: IWatchlistsState = {
   items: [],
@@ -13,12 +13,12 @@ const watchlistsSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string;
-        name: string;
         icon: string;
+        name: string;
         coins: ICoin[];
       }>,
     ) => {
-      const { id, name, icon, coins } = action.payload;
+      const { id, icon, name, coins } = action.payload;
       state.items.push({
         id,
         icon,
@@ -27,8 +27,29 @@ const watchlistsSlice = createSlice({
         coins,
       });
     },
+
+    updateWatchlist: (
+      state,
+      action: PayloadAction<{
+        watchlistId: string;
+        newName?: string;
+        newIcon?: any;
+        newCoins?: ICoin[];
+      }>,
+    ) => {
+      const { watchlistId, newName, newIcon, newCoins } = action.payload;
+      const watchlist = state.items.find((w) => w.id === watchlistId);
+      if (!watchlist) return;
+
+      if (newName) watchlist.name = newName;
+      if (newIcon) watchlist.icon = newIcon;
+      if (newCoins !== undefined) {
+        watchlist.coins = newCoins;
+        watchlist.coinCount = newCoins.length;
+      }
+    },
   },
 });
 
-export const { createWatchlist } = watchlistsSlice.actions;
+export const { createWatchlist, updateWatchlist } = watchlistsSlice.actions;
 export default watchlistsSlice.reducer;

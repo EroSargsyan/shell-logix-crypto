@@ -45,14 +45,14 @@ export interface ICoinsState {
   error: string | null;
 }
 
-export interface IWatchlistModalProps {
+export interface IWatchlistsModalProps {
   visible: boolean;
   onClose: () => void;
   watchlists: IWatchlistItem[];
   selectedWatchlistId?: string;
   onSelectWatchlist: (id: string) => void;
   onCreateNew: () => void;
-  onEditPress: () => void;
+  onEditWatchlist: (id: string) => void;
 }
 
 export interface IWatchlist {

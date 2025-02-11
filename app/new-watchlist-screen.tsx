@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  cancelText: { fontSize: 16, color: '#666' },
+  cancelText: { fontSize: 16, color: '#8e44ad' },
   title: { fontSize: 16, fontWeight: '600', color: '#000' },
   createText: { fontSize: 16, color: '#8e44ad' },
   body: { flex: 1, padding: 24, alignItems: 'center' },

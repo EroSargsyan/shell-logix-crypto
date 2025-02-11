@@ -73,7 +73,10 @@ export default function MainScreen() {
         selectedWatchlistId={selectedWatchlist?.id}
         onSelectWatchlist={handleSelectWatchlist}
         onCreateNew={handleOnCreateNew}
-        onEditPress={() => {}}
+        onEditWatchlist={(id) => {
+          setModalVisible(false);
+          router.push(`/edit-watchlist-screen?watchlistId=${id}`);
+        }}
       />
     </SafeAreaView>
   );
