@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Button, StyleSheet, SafeAreaView } from 'react-native';
-import WatchlistsModal from '../components/ui/WatchlistsModal';
+import WatchlistsModal from '../components/ui/modal/WatchlistsModal';
 import { router } from 'expo-router';
 
 export default function MainScreen() {
