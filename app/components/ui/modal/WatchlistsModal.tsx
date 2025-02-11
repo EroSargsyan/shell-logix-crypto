@@ -1,4 +1,4 @@
-import { View, Text, Modal, Pressable, StyleSheet, FlatList, Image, Alert } from 'react-native';
+import { View, Text, Modal, Pressable, StyleSheet, FlatList, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { IWatchlistItem, IWatchlistsModalProps } from '@/app/types/types';
 
@@ -29,11 +29,15 @@ export default function WatchlistsModal({
     return (
       <View style={styles.itemRow}>
         <Pressable style={styles.itemContainer} onPress={() => onSelectWatchlist(item.id)}>
-          <Image source={item.icon} style={styles.icon} />
+          <View style={styles.iconWrapper}>
+            <Ionicons name={item.icon} size={34} color="#8e44ad" />
+          </View>
+
           <View style={{ flex: 1 }}>
             <Text style={styles.itemTitle}>{item.name}</Text>
             <Text style={styles.itemSubtitle}>{item.coinCount} Coin(s)</Text>
           </View>
+
           {isSelected && <Text style={styles.checkmark}>✔</Text>}
         </Pressable>
 
@@ -109,7 +113,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
   },
-  icon: { width: 34, height: 34, marginRight: 12, borderRadius: 17 },
+  iconWrapper: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
   itemTitle: { fontSize: 15, fontWeight: '500', color: '#000' },
   itemSubtitle: { fontSize: 13, color: '#777' },
   checkmark: { fontSize: 18, color: '#8e44ad', fontWeight: '600', marginLeft: 8 },
