@@ -3,6 +3,7 @@ export interface IWatchlistItem {
   icon: any;
   name: string;
   coinCount: number;
+  coins: ICoin[];
 }
 
 export interface ICoin {
@@ -57,10 +58,17 @@ export interface IWatchlistModalProps {
 export interface IWatchlist {
   id: string;
   name: string;
+  icon: string;
+  coinCount: number;
   coins: ICoin[];
 }
 
 export interface IWatchlistsState {
   items: IWatchlist[];
-  selectedWatchlistId: string | null;
+  // selectedWatchlistId: string | null;
+}
+
+export interface ITempWatchlistState {
+  icon: string;
+  selectedCoins: ICoin[];
 }
