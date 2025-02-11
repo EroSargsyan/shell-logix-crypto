@@ -73,3 +73,10 @@ export interface ITempWatchlistState {
   icon: string;
   selectedCoins: ICoin[];
 }
+
+export interface IIconSelectionModalProps {
+  visible: boolean;
+  selectedIcon: string;
+  onSelectIcon: (iconName: string) => void;
+  onClose: () => void;
+}

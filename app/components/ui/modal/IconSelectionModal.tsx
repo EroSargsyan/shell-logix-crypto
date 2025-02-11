@@ -1,4 +1,4 @@
-import { View, Text, Modal, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Modal, Pressable, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { availableIcons } from '@/app/constants/Icons';
 import { IIconSelectionModalProps } from '@/app/types/types';
@@ -11,28 +11,29 @@ export default function IconSelectionModal({
 }: IIconSelectionModalProps) {
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <View style={styles.modalOverlay}>
-        <Pressable style={styles.modalBackground} onPress={onClose} />
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Select an Icon</Text>
-          <View style={styles.iconGrid}>
-            {availableIcons.map((iconName, index) => (
-              <Pressable
-                key={index}
-                onPress={() => onSelectIcon(iconName)}
-                style={styles.iconWrapper}
-              >
-                <Ionicons
-                  name={iconName}
-                  size={40}
-                  color={selectedIcon === iconName ? '#8e44ad' : '#444'}
-                  style={selectedIcon === iconName && styles.selectedIcon}
-                />
-              </Pressable>
-            ))}
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Select an Icon</Text>
+            <View style={styles.iconGrid}>
+              {availableIcons.map((iconName, index) => (
+                <Pressable
+                  key={index}
+                  onPress={() => onSelectIcon(iconName)}
+                  style={styles.iconWrapper}
+                >
+                  <Ionicons
+                    name={iconName}
+                    size={40}
+                    color={selectedIcon === iconName ? '#8e44ad' : '#444'}
+                    style={selectedIcon === iconName && styles.selectedIcon}
+                  />
+                </Pressable>
+              ))}
+            </View>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 }
@@ -44,7 +45,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
-  modalBackground: { flex: 1 },
   modalContainer: {
     backgroundColor: '#fff',
     borderRadius: 16,
