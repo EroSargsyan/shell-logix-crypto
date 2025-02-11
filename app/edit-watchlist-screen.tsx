@@ -205,8 +205,11 @@ const styles = StyleSheet.create({
   },
 
   cancelText: { fontSize: 16, color: '#8e44ad' },
+
   title: { fontSize: 16, fontWeight: '600' },
+
   doneText: { fontSize: 16, color: '#8e44ad' },
+
   body: { flex: 1, padding: 16 },
 
   watchlistIconContainer: {
@@ -225,6 +228,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+
   coinRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -234,11 +238,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#ddd',
   },
+
   coinSymbol: { fontSize: 16, fontWeight: '600' },
+
   coinName: { fontSize: 13, color: '#666' },
+
   rowActions: { flexDirection: 'row', alignItems: 'center' },
+
   selectBtn: { marginRight: 12 },
+
   moveArrows: { flexDirection: 'column', justifyContent: 'center' },
+
   addCoinsBtn: {
     marginTop: 16,
     alignSelf: 'center',
@@ -246,6 +256,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     borderRadius: 8,
   },
+
   addCoinsText: {
     fontSize: 16,
     fontWeight: '500',
