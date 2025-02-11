@@ -165,7 +165,12 @@ export default function EditWatchlistScreen() {
       </View>
 
       <View style={styles.body}>
-        <Text style={styles.watchlistIcon}>🦄</Text>
+        {watchlist && (
+          <View style={styles.watchlistIconContainer}>
+            <Ionicons name={watchlist.icon as any} size={50} color="#8e44ad" />
+          </View>
+        )}
+
         <TextInput
           style={styles.nameInput}
           placeholder="Watchlist Name"
@@ -190,6 +195,7 @@ export default function EditWatchlistScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
+
   header: {
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -197,11 +203,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   cancelText: { fontSize: 16, color: '#8e44ad' },
   title: { fontSize: 16, fontWeight: '600' },
   doneText: { fontSize: 16, color: '#8e44ad' },
   body: { flex: 1, padding: 16 },
-  watchlistIcon: { fontSize: 50, textAlign: 'center' },
+
+  watchlistIconContainer: {
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
   nameInput: {
     alignSelf: 'center',
     width: '80%',
