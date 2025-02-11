@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import 'react-native-reanimated';
 import { useColorScheme } from './hooks/useColorScheme.web';
 import { store } from './redux/store';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,16 +29,18 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Provider store={store}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="new-watchlist-screen" options={{ headerShown: false }} />
-          <Stack.Screen name="add-coins-screen" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </Provider>
-    </ThemeProvider>
+    <GestureHandlerRootView>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Provider store={store}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="new-watchlist-screen" options={{ headerShown: false }} />
+            <Stack.Screen name="add-coins-screen" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" />
+        </Provider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
