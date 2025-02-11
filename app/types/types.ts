@@ -53,3 +53,14 @@ export interface IWatchlistModalProps {
   onCreateNew: () => void;
   onEditPress: () => void;
 }
+
+export interface IWatchlist {
+  id: string;
+  name: string;
+  coins: ICoin[];
+}
+
+export interface IWatchlistsState {
+  items: IWatchlist[];
+  selectedWatchlistId: string | null;
+}
