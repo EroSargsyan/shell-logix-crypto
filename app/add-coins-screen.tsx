@@ -10,20 +10,29 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from './redux/store';
-import { getCoinsMarkets } from './redux/slices/coinsSlice';
-import { setSelectedCoins } from './redux/slices/tempWatchlistsSlice';
-import { ICoin } from './types/types';
+import { AppDispatch, RootState } from '@/app/redux/store';
+import { getCoinsMarkets } from '@/app/redux/slices/coinsSlice';
+import { setSelectedCoins } from '@/app/redux/slices/tempWatchlistsSlice';
+import { ICoin } from '@/app/types/types';
 
 export default function AddCoinsScreen() {
   const dispatch = useDispatch<AppDispatch>();
 
+  const { existingCoinIds } = useLocalSearchParams();
+  let excludedCoinIds: string[] = [];
+  if (existingCoinIds) {
+    if (typeof existingCoinIds === 'string') {
+      excludedCoinIds = existingCoinIds.split(',');
+    } else if (Array.isArray(existingCoinIds)) {
+      excludedCoinIds = existingCoinIds;
+    }
+  }
+
   const { items: allCoins, status, error } = useSelector((state: RootState) => state.coins);
   const tempCoins = useSelector((state: RootState) => state.tempWatchlists.selectedCoins);
-  const initialSelectedIds = tempCoins?.map((coin: ICoin) => coin.id);
-
+  const initialSelectedIds = tempCoins?.map((coin: ICoin) => coin.id) || [];
   const [selectedCoinIds, setSelectedCoinIds] = useState<string[]>(initialSelectedIds);
 
   const [searchText, setSearchText] = useState('');
@@ -37,19 +46,18 @@ export default function AddCoinsScreen() {
 
   const handleDonePress = () => {
     const selectedCoins = allCoins.filter((coin) => selectedCoinIds.includes(coin.id));
-
     dispatch(setSelectedCoins(selectedCoins));
     router.back();
   };
 
   useEffect(() => {
-    const filteredCoins = allCoins.filter(
+    const filtered = allCoins.filter(
       (coin) =>
-        coin.symbol.toLowerCase().includes(searchText.toLowerCase()) ||
-        coin.name.toLowerCase().includes(searchText.toLowerCase()),
+        !excludedCoinIds.includes(coin.id) &&
+        (coin.symbol.toLowerCase().includes(searchText.toLowerCase()) ||
+          coin.name.toLowerCase().includes(searchText.toLowerCase())),
     );
-
-    setFilteredCoins(filteredCoins);
+    setFilteredCoins(filtered);
   }, [searchText]);
 
   useEffect(() => {
@@ -59,7 +67,6 @@ export default function AddCoinsScreen() {
   }, [dispatch, allCoins.length, status]);
 
   if (status === 'loading') {
-    // TODO handle going back to the screen
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#8e44ad" />
@@ -68,7 +75,6 @@ export default function AddCoinsScreen() {
   }
   if (status === 'failed') {
     return (
-      // TODO handle going back to the screen
       <View style={styles.centered}>
         <Text style={{ color: 'red' }}>Error: {error}</Text>
       </View>

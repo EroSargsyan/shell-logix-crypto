@@ -19,7 +19,7 @@ export default function WatchlistsModal({
           <Image source={item.icon} style={styles.icon} />
           <View style={{ flex: 1 }}>
             <Text style={styles.itemTitle}>{item.name}</Text>
-            <Text style={styles.itemSubtitle}>{item.coinCount} Coins</Text>
+            <Text style={styles.itemSubtitle}>{item.coinCount} Coin(s)</Text>
           </View>
           {isSelected && <Text style={styles.checkmark}>✔</Text>}
         </Pressable>

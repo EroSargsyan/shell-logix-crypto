@@ -11,10 +11,12 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
 import { ICoin, IWatchlist } from '@/app/types/types';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppDispatch, RootState } from '@/app/redux/store';
 import { updateWatchlist } from '@/app/redux/slices/watchlistsSlice';
+import { setSelectedCoins } from '@/app/redux/slices/tempWatchlistsSlice';
 
 interface LocalCoin {
   data: ICoin;
@@ -47,12 +49,11 @@ export default function EditWatchlistScreen() {
     }
   }, [watchlist]);
 
+  // TODO use DraggableFlatList
   const moveItem = useCallback((index: number, direction: 'up' | 'down') => {
     setLocalCoins((prev) => {
-      // shallow-copy array
       const updated = [...prev];
       if (direction === 'up' && index > 0) {
-        // swap
         const temp = updated[index].order;
         updated[index].order = updated[index - 1].order;
         updated[index - 1].order = temp;
@@ -61,8 +62,7 @@ export default function EditWatchlistScreen() {
         updated[index].order = updated[index + 1].order;
         updated[index + 1].order = temp;
       }
-      // sort by .order so the UI re-renders in correct order
-      return [...updated].sort((a, b) => a.order - b.order);
+      return updated.sort((a, b) => a.order - b.order);
     });
   }, []);
 
@@ -71,6 +71,27 @@ export default function EditWatchlistScreen() {
       prev.map((item) => (item.data.id === coinId ? { ...item, selected: !item.selected } : item)),
     );
   }, []);
+
+  const tempSelectedCoins = useSelector((state: RootState) => state.tempWatchlists.selectedCoins);
+  useFocusEffect(
+    useCallback(() => {
+      if (tempSelectedCoins && tempSelectedCoins.length > 0) {
+        setLocalCoins((prev) => {
+          const existingIds = prev.map((item) => item.data.id);
+          const newCoins = tempSelectedCoins.filter((coin) => !existingIds.includes(coin.id));
+          const nextOrder = prev.length;
+          const newLocalCoins = newCoins.map((coin, index) => ({
+            data: coin,
+            selected: true,
+            order: nextOrder + index,
+          }));
+          return [...prev, ...newLocalCoins];
+        });
+
+        dispatch(setSelectedCoins([]));
+      }
+    }, [tempSelectedCoins, dispatch]),
+  );
 
   const handleDonePress = () => {
     if (!name.trim() || !watchlist) {
@@ -97,7 +118,8 @@ export default function EditWatchlistScreen() {
   };
 
   const handleAddCoinsPress = () => {
-    // e.g. router.push(`/add-coins-screen?editMode=1&watchlistId=${watchlistId}`)
+    const existingCoinIds = localCoins.map((item) => item.data.id);
+    router.push(`/add-coins-screen?existingCoinIds=${existingCoinIds.join(',')}`);
   };
 
   const renderCoinRow = useCallback(
@@ -115,7 +137,6 @@ export default function EditWatchlistScreen() {
                 {isSelected ? '✔' : '+'}
               </Text>
             </Pressable>
-
             <View style={styles.moveArrows}>
               <Pressable onPress={() => moveItem(index, 'up')}>
                 <Ionicons name="chevron-up" size={20} color="#8e44ad" />
@@ -203,15 +224,9 @@ const styles = StyleSheet.create({
   },
   coinSymbol: { fontSize: 16, fontWeight: '600' },
   coinName: { fontSize: 13, color: '#666' },
-  rowActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+  rowActions: { flexDirection: 'row', alignItems: 'center' },
   selectBtn: { marginRight: 12 },
-  moveArrows: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
+  moveArrows: { flexDirection: 'column', justifyContent: 'center' },
   addCoinsBtn: {
     marginTop: 16,
     alignSelf: 'center',
