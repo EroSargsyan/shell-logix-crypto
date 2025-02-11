@@ -2,9 +2,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Button, FlatList } from 'react-native';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../redux/store';
-import { getCoinsMarkets } from '../redux/slices/coinsSlice';
-import WatchlistsModal from '../components/ui/modal/WatchlistsModal';
+import { AppDispatch, RootState } from './redux/store';
+import { getCoinsMarkets } from './redux/slices/coinsSlice';
+import WatchlistsModal from './components/ui/modal/WatchlistsModal';
 import { ICoin, IWatchlist } from '@/app/types/types';
 
 export default function MainScreen() {

@@ -33,7 +33,7 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Provider store={store}>
           <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="new-watchlist-screen" options={{ headerShown: false }} />
             <Stack.Screen name="add-coins-screen" options={{ headerShown: false }} />
             <Stack.Screen name="edit-watchlist-screen" options={{ headerShown: false }} />
