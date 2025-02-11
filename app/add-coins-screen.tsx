@@ -1,5 +1,4 @@
-
-import  { useState } from 'react'
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,43 +7,91 @@ import {
   Pressable,
   StyleSheet,
   SafeAreaView,
-} from 'react-native'
-import { Coin } from './types/types'
-import { router } from 'expo-router'
-
-
-
-
-const COINS: Coin[] = [
-  { id: 'btc', symbol: 'BTC', name: 'Bitcoin' },
-  { id: 'eth', symbol: 'ETH', name: 'Ethereum' },
-  { id: 'usdt', symbol: 'USDT', name: 'Tether' },
-  { id: 'xrp', symbol: 'XRP', name: 'XRP' },
-  { id: 'bch', symbol: 'BCH', name: 'Bitcoin Cash' },
-
-]
+  ActivityIndicator,
+  Image,
+} from 'react-native';
+import { router } from 'expo-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from './redux/store';
+import { getCoinsMarkets } from './redux/slices/coinsSlice';
+import { setSelectedCoins } from './redux/slices/tempWatchlistsSlice';
+import { ICoin } from './types/types';
 
 export default function AddCoinsScreen() {
-  const [searchText, setSearchText] = useState('')
-  const [selectedCoins, setSelectedCoins] = useState<string[]>([])
+  const dispatch = useDispatch<AppDispatch>();
 
-  const filteredCoins = COINS.filter(
-    coin =>
-      coin.symbol.toLowerCase().includes(searchText.toLowerCase()) ||
-      coin.name.toLowerCase().includes(searchText.toLowerCase())
-  )
+  const { items: allCoins, status, error } = useSelector((state: RootState) => state.coins);
+  const tempCoins = useSelector((state: RootState) => state.tempWatchlists.selectedCoins);
+  const initialSelectedIds = tempCoins?.map((coin: ICoin) => coin.id);
+
+  const [selectedCoinIds, setSelectedCoinIds] = useState<string[]>(initialSelectedIds);
+
+  const [searchText, setSearchText] = useState('');
+  const [filteredCoins, setFilteredCoins] = useState<ICoin[]>([]);
 
   const toggleCoin = (coinId: string) => {
-    setSelectedCoins(prev =>
-      prev.includes(coinId) ? prev.filter(id => id !== coinId) : [...prev, coinId]
-    )
-  }
+    setSelectedCoinIds((prev) =>
+      prev.includes(coinId) ? prev.filter((id) => id !== coinId) : [...prev, coinId],
+    );
+  };
 
   const handleDonePress = () => {
-    // e.g. dispatch(addCoinsToWatchlist(selectedCoins)) 
-    // or pass them back to the previous screen
-    router.back()
+    const selectedCoins = allCoins.filter((coin) => selectedCoinIds.includes(coin.id));
+
+    dispatch(setSelectedCoins(selectedCoins));
+    router.back();
+  };
+
+  useEffect(() => {
+    const filteredCoins = allCoins.filter(
+      (coin) =>
+        coin.symbol.toLowerCase().includes(searchText.toLowerCase()) ||
+        coin.name.toLowerCase().includes(searchText.toLowerCase()),
+    );
+
+    setFilteredCoins(filteredCoins);
+  }, [searchText]);
+
+  useEffect(() => {
+    if (allCoins.length === 0 && status === 'idle') {
+      dispatch(getCoinsMarkets());
+    }
+  }, [dispatch, allCoins.length, status]);
+
+  if (status === 'loading') {
+    // TODO handle going back to the screen
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#8e44ad" />
+      </View>
+    );
   }
+  if (status === 'failed') {
+    return (
+      // TODO handle going back to the screen
+      <View style={styles.centered}>
+        <Text style={{ color: 'red' }}>Error: {error}</Text>
+      </View>
+    );
+  }
+
+  const renderCoinItem = ({ item }: { item: ICoin }) => {
+    const isSelected = selectedCoinIds.includes(item.id);
+    return (
+      <View style={styles.coinRow}>
+        <View style={styles.coinInfo}>
+          <Image source={{ uri: item.image }} style={styles.coinImage} />
+          <View>
+            <Text style={styles.symbol}>{item.symbol.toUpperCase()}</Text>
+            <Text style={styles.name}>{item.name}</Text>
+          </View>
+        </View>
+        <Pressable style={styles.addBtn} onPress={() => toggleCoin(item.id)}>
+          <Text style={{ color: isSelected ? '#888' : '#8e44ad' }}>{isSelected ? '✔' : '+'}</Text>
+        </Pressable>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -59,47 +106,21 @@ export default function AddCoinsScreen() {
         </Pressable>
       </View>
 
-      {/* Search Bar */}
       <TextInput
         style={styles.searchInput}
-        placeholder="Search"
+        placeholder="Search coins..."
         onChangeText={setSearchText}
         value={searchText}
       />
 
-      {/* Coins List */}
-      <FlatList
-        data={filteredCoins}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => {
-          const isSelected = selectedCoins.includes(item.id)
-          return (
-            <View style={styles.coinRow}>
-              <View style={styles.coinInfo}>
-                <Text style={styles.symbol}>{item.symbol}</Text>
-                <Text style={styles.name}>{item.name}</Text>
-              </View>
-              <Pressable
-                style={styles.addBtn}
-                onPress={() => toggleCoin(item.id)}
-              >
-                <Text style={{ color: isSelected ? '#888' : '#8e44ad' }}>
-                  {isSelected ? '✔' : '+'}
-                </Text>
-              </Pressable>
-            </View>
-          )
-        }}
-      />
+      <FlatList data={filteredCoins} keyExtractor={(item) => item.id} renderItem={renderCoinItem} />
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: {
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -107,18 +128,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  cancelText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  doneText: {
-    fontSize: 16,
-    color: '#8e44ad',
-  },
+  cancelText: { fontSize: 16, color: '#666' },
+  title: { fontSize: 16, fontWeight: '600' },
+  doneText: { fontSize: 16, color: '#8e44ad' },
   searchInput: {
     margin: 16,
     padding: 12,
@@ -135,18 +147,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#eee',
   },
-  coinInfo: {
-    flexDirection: 'column',
-  },
-  symbol: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  name: {
-    fontSize: 12,
-    color: '#666',
-  },
-  addBtn: {
-    padding: 8,
-  },
-})
+  coinInfo: { flexDirection: 'row', alignItems: 'center' },
+  coinImage: { width: 32, height: 32, marginRight: 12, borderRadius: 16 },
+  symbol: { fontSize: 16, fontWeight: '500' },
+  name: { fontSize: 12, color: '#666' },
+  addBtn: { padding: 8 },
+});
