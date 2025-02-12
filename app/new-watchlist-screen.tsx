@@ -103,10 +103,14 @@ export default function NewWatchlistScreen() {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={styles.coinRow}>
-                <Image source={{ uri: item.image }} style={styles.coinImage} />
-                <View>
-                  <Text style={styles.symbol}>{item.symbol.toUpperCase()}</Text>
-                  <Text style={styles.coinName}>{item.name}</Text>
+                <View style={styles.coinInfo}>
+                  <Image source={{ uri: item.image }} style={styles.coinImage} />
+                  <View style={{ flexDirection: 'column' }}>
+                    <Text style={styles.coinSymbol}>{item.symbol.toUpperCase()}</Text>
+                    <Text style={styles.coinName} numberOfLines={1} ellipsizeMode="tail">
+                      {item.name}
+                    </Text>
+                  </View>
                 </View>
               </View>
             )}
@@ -200,35 +204,42 @@ const styles = StyleSheet.create({
     color: Colors.text,
     backgroundColor: Colors.cardBackground,
   },
+
   flatListContainer: {
     flex: 5,
     marginTop: scale(16),
     width: '100%',
   },
+
   coinRow: {
+    backgroundColor: Colors.cardBackground,
+    borderRadius: scale(8),
+    paddingHorizontal: scale(12),
+    paddingVertical: scale(12),
+    marginVertical: scale(4),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: scale(2) },
+    shadowOpacity: 0.1,
+    shadowRadius: scale(4),
+    elevation: 3,
+  },
+
+  coinInfo: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: scale(8),
-    borderBottomWidth: scale(0.5),
-    borderBottomColor: Colors.border,
-    width: '100%',
   },
-  coinImage: {
-    width: scale(24),
-    height: scale(24),
-    marginRight: scale(8),
-    borderRadius: scale(12),
-  },
-  symbol: {
-    fontSize: scale(14),
-    fontWeight: '500',
+
+  coinSymbol: {
+    fontSize: scale(16),
+    fontWeight: '600',
     color: Colors.text,
   },
   coinName: {
-    fontSize: scale(12),
+    fontSize: scale(14),
     color: Colors.text,
+    marginTop: scale(4),
   },
-
   actionRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -239,15 +250,30 @@ const styles = StyleSheet.create({
     marginBottom: scale(16),
     backgroundColor: Colors.cardBackground,
   },
-
   actionButton: {
     paddingVertical: scale(8),
     paddingHorizontal: scale(12),
   },
-
   actionText: {
     fontSize: scale(16),
     color: Colors.primary,
     fontWeight: '600',
+  },
+
+  rowActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  selectBtn: {
+    marginRight: scale(12),
+    padding: scale(8),
+  },
+
+  coinImage: {
+    width: scale(24),
+    height: scale(24),
+    marginRight: scale(8),
+    borderRadius: scale(12),
   },
 });
