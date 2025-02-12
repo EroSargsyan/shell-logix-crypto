@@ -6,7 +6,7 @@ export async function fetchCoinsMarkets(): Promise<any[]> {
   if (!apiKey) {
     throw new Error('Missing API key: Please provide a valid COINGECKO_API_KEY in your .env file.');
   }
-  console.log('apiKey- BaseURL', apiKey, BASE_URL);
+
   const url = `${BASE_URL}/coins/markets?vs_currency=usd`;
   const options = {
     method: 'GET',
