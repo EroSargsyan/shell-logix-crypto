@@ -141,7 +141,3 @@ _(https://www.dropbox.com/scl/fi/jd7744hl289870q11l3dg/Screen-Recording-2025-02-
 ---
 
 **Thank you for reviewing this test task!**
-
-```
-
-```
