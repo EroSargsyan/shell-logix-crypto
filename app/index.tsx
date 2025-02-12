@@ -1,5 +1,14 @@
 import { useState, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Button, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  Button,
+  FlatList,
+  Share,
+  Pressable,
+} from 'react-native';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -31,7 +40,6 @@ export default function MainScreen() {
     if (!selectedWatchlist || !allCoins) {
       return;
     }
-    console.log('useEffect');
 
     const watchlistCoinIds = new Set(selectedWatchlist.coins.map((c) => c.id));
     const filteredCoins = allCoins.filter((coin) => watchlistCoinIds.has(coin.id));
@@ -68,6 +76,17 @@ export default function MainScreen() {
     }
   };
 
+  const handleShareWatchlist = async () => {
+    if (!selectedWatchlist) return;
+    try {
+      const coinList = displayedCoins.map((coin) => coin.name).join(', ');
+      const message = `Watchlist: ${selectedWatchlist.name}\nCoins: ${coinList}`;
+      await Share.share({ message });
+    } catch (error) {
+      console.log('Error sharing watchlist:', error);
+    }
+  };
+
   const renderCoin = ({ item }: { item: ICoin }) => (
     <View style={styles.coinRow}>
       <Text style={styles.coinName}>{item.name}</Text>
@@ -84,8 +103,14 @@ export default function MainScreen() {
       {selectedWatchlist ? (
         <View style={styles.listArea}>
           <View style={styles.watchlistHeader}>
+            <View style={styles.watchlistInfo}>
+              {/* TODO make shorter if too long */}
+              <Text style={styles.listTitle}>{selectedWatchlist.name}</Text>
+            </View>
             <Ionicons name={selectedWatchlist.icon as any} size={40} color="#8e44ad" />
-            <Text style={styles.listTitle}>{selectedWatchlist.name}</Text>
+            <Pressable style={styles.shareIconContainer} onPress={handleShareWatchlist}>
+              <Ionicons name="share-social-outline" size={24} color="#8e44ad" />
+            </Pressable>
           </View>
 
           <FlatList
@@ -106,8 +131,6 @@ export default function MainScreen() {
       <WatchlistsModal
         visible={isModalVisible}
         onClose={() => setModalVisible(false)}
-        watchlists={watchlists}
-        selectedWatchlistId={selectedWatchlist?.id}
         onSelectWatchlist={handleSelectWatchlist}
         onCreateNew={handleOnCreateNew}
         onEditWatchlist={handleEditWatchlist}
@@ -119,14 +142,17 @@ export default function MainScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff', paddingTop: 20 },
+
   topBar: {
     paddingTop: 16,
     paddingHorizontal: 16,
   },
+
   listArea: {
     flex: 1,
     padding: 16,
   },
+
   listTitle: {
     fontSize: 18,
     fontWeight: '600',
@@ -144,6 +170,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   coinRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -151,12 +178,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#eee',
   },
+
   coinName: {
     fontSize: 16,
     fontWeight: '500',
   },
+
   coinPrice: {
     fontSize: 16,
     color: '#8e44ad',
+  },
+
+  watchlistInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  shareIconContainer: {
+    marginLeft: 'auto',
+    padding: 8,
   },
 });
