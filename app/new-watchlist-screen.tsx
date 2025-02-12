@@ -68,6 +68,20 @@ export default function NewWatchlistScreen() {
     setIconModalVisible(false);
   };
 
+  const renderListItem = ({ item }: { item: any }) => (
+    <View style={styles.coinRow}>
+      <View style={styles.coinInfo}>
+        <Image source={{ uri: item.image }} style={styles.coinImage} />
+        <View style={{ flexDirection: 'column' }}>
+          <Text style={styles.coinSymbol}>{item.symbol.toUpperCase()}</Text>
+          <Text style={styles.coinName} numberOfLines={1} ellipsizeMode="tail">
+            {item.name}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -101,19 +115,7 @@ export default function NewWatchlistScreen() {
           <FlatList
             data={tempWatchlist}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.coinRow}>
-                <View style={styles.coinInfo}>
-                  <Image source={{ uri: item.image }} style={styles.coinImage} />
-                  <View style={{ flexDirection: 'column' }}>
-                    <Text style={styles.coinSymbol}>{item.symbol.toUpperCase()}</Text>
-                    <Text style={styles.coinName} numberOfLines={1} ellipsizeMode="tail">
-                      {item.name}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            )}
+            renderItem={renderListItem}
           />
         </View>
 
