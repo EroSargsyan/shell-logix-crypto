@@ -1,5 +1,15 @@
 import { useState, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, Share, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  FlatList,
+  Share,
+  Pressable,
+  Dimensions,
+  Image,
+} from 'react-native';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -12,6 +22,10 @@ import {
   setSelectedWatchlistId,
 } from './redux/slices/watchlistsSlice';
 import WatchlistsModal from './components/ui/modal/WatchlistsModal';
+
+const { width } = Dimensions.get('window');
+const guidelineBaseWidth = 375;
+const scale = (size: number) => (width / guidelineBaseWidth) * size;
 
 export default function MainScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -82,8 +96,16 @@ export default function MainScreen() {
 
   const renderCoin = ({ item }: { item: ICoin }) => (
     <View style={styles.coinRow}>
-      <Text style={styles.coinName}>{item.name}</Text>
-      <Text style={styles.coinPrice}>${item.current_price}</Text>
+      <View style={styles.coinInfo}>
+        <Image source={{ uri: item.image }} style={styles.coinImage} />
+        <View>
+          <Text style={styles.symbol}>{item.symbol.toUpperCase()}</Text>
+          <Text style={styles.name}>{item.name}</Text>
+        </View>
+      </View>
+      <View style={styles.rowActions}>
+        <Text style={styles.coinPrice}>${item.current_price}</Text>
+      </View>
     </View>
   );
 
@@ -153,20 +175,24 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
     marginBottom: 16,
   },
+
   headerTitle: {
     color: Colors.primary,
     fontSize: 20,
     fontWeight: 'bold',
   },
+
   watchlistButton: {
     backgroundColor: Colors.primary,
     padding: 8,
     borderRadius: 8,
   },
+
   content: {
     flex: 1,
     paddingHorizontal: 16,
   },
+
   watchlistHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -174,67 +200,95 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
+
   watchlistIconContainer: {
     width: 50,
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   watchlistTitleContainer: {
     flex: 1,
     alignItems: 'center',
+    paddingHorizontal: scale(12),
   },
   watchlistTitle: {
     fontSize: 22,
     fontWeight: '600',
     color: Colors.text,
   },
+
   shareButton: {
     backgroundColor: Colors.secondary,
     padding: 8,
     borderRadius: 8,
   },
-  coinRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: Colors.cardBackground,
-    padding: 12,
-    marginVertical: 6,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+
   coinName: {
     fontSize: 16,
     fontWeight: '500',
     color: Colors.text,
   },
+
   coinPrice: {
     fontSize: 16,
     fontWeight: '500',
     color: Colors.primary,
   },
+
   emptyText: {
     textAlign: 'center',
     marginTop: 20,
     color: Colors.text,
   },
+
   placeholder: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   placeholderText: {
     color: Colors.text,
     fontSize: 16,
+  },
+
+  coinRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(12),
+    borderBottomWidth: scale(0.5),
+    borderBottomColor: Colors.border,
+  },
+
+  coinInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  coinImage: {
+    width: scale(32),
+    height: scale(32),
+    marginRight: scale(12),
+    borderRadius: scale(16),
+  },
+
+  symbol: {
+    fontSize: scale(16),
+    fontWeight: '500',
+    color: Colors.text,
+  },
+
+  name: {
+    fontSize: scale(12),
+    color: Colors.text,
+  },
+
+  rowActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
