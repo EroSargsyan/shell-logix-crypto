@@ -129,7 +129,7 @@ export default function AddCoinsScreen() {
       <TextInput
         style={styles.searchInput}
         placeholder="Search coins..."
-        placeholderTextColor={Colors.text}
+        placeholderTextColor={Colors.placeholderText}
         onChangeText={setSearchText}
         value={searchText}
       />

@@ -92,8 +92,14 @@ export default function NewWatchlistScreen() {
           <Text style={styles.actionText}>Cancel</Text>
         </Pressable>
 
-        <Pressable onPress={handleCreatePress} style={styles.actionButton}>
-          <Text style={styles.actionText}>Create</Text>
+        <Pressable
+          onPress={handleCreatePress}
+          style={styles.actionButton}
+          disabled={!watchlistName.trim()}
+        >
+          <Text style={[styles.actionText, !watchlistName.trim() && styles.disabledText]}>
+            Create
+          </Text>
         </Pressable>
       </View>
 
@@ -104,7 +110,7 @@ export default function NewWatchlistScreen() {
         <TextInput
           style={styles.nameInput}
           placeholder="Watchlist Name"
-          placeholderTextColor={Colors.text}
+          placeholderTextColor={Colors.placeholderText}
           value={watchlistName}
           onChangeText={handleNameChange}
           multiline
@@ -116,6 +122,7 @@ export default function NewWatchlistScreen() {
             data={tempWatchlist}
             keyExtractor={(item) => item.id}
             renderItem={renderListItem}
+            ListEmptyComponent={<Text style={styles.emptyText}>No coins added.</Text>}
           />
         </View>
 
@@ -277,5 +284,15 @@ const styles = StyleSheet.create({
     height: scale(24),
     marginRight: scale(8),
     borderRadius: scale(12),
+  },
+
+  disabledText: {
+    color: Colors.disabledText,
+  },
+
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: Colors.text,
   },
 });
