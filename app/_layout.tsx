@@ -1,14 +1,14 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { Provider } from 'react-redux';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { useColorScheme } from './hooks/useColorScheme.web';
 import { store } from './redux/store';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AppNavigator from './navigator/AppNavigator';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,13 +32,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Provider store={store}>
-          <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="new-watchlist-screen" options={{ headerShown: false }} />
-            <Stack.Screen name="add-coins-screen" options={{ headerShown: false }} />
-            <Stack.Screen name="edit-watchlist-screen" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
+          <AppNavigator />
           <StatusBar style="auto" />
         </Provider>
       </ThemeProvider>

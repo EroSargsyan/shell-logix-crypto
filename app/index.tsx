@@ -1,10 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Button, FlatList } from 'react-native';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppDispatch, RootState } from './redux/store';
-import { getCoinsMarkets } from './redux/slices/coinsSlice';
 import { deleteWatchlist } from './redux/slices/watchlistsSlice';
 import WatchlistsModal from './components/ui/modal/WatchlistsModal';
 import { ICoin, IWatchlist } from '@/app/types/types';
@@ -46,10 +45,6 @@ export default function MainScreen() {
       setSelectedWatchlist(watchlists.length - 1 ? watchlists[0] : null);
     }
   };
-
-  useEffect(() => {
-    dispatch(getCoinsMarkets());
-  }, [dispatch]);
 
   const renderCoin = ({ item }: { item: ICoin }) => (
     <View style={styles.coinRow}>
