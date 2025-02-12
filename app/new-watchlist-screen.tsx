@@ -19,6 +19,7 @@ import { availableIcons } from './constants/Icons';
 import IconSelectionModal from './components/ui/modal/IconSelectionModal';
 import Colors from './constants/Colors';
 import { Dimensions } from 'react-native';
+import { Texts } from './constants/Texts';
 
 const { width } = Dimensions.get('window');
 const guidelineBaseWidth = 375;
@@ -122,7 +123,7 @@ export default function NewWatchlistScreen() {
             data={tempWatchlist}
             keyExtractor={(item) => item.id}
             renderItem={renderListItem}
-            ListEmptyComponent={<Text style={styles.emptyText}>No coins added.</Text>}
+            ListEmptyComponent={<Text style={styles.emptyText}>{Texts.noCoins}</Text>}
           />
         </View>
 

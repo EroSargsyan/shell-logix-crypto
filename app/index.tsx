@@ -22,6 +22,7 @@ import {
   setSelectedWatchlistId,
 } from './redux/slices/watchlistsSlice';
 import WatchlistsModal from './components/ui/modal/WatchlistsModal';
+import { Texts } from './constants/Texts';
 
 const { width } = Dimensions.get('window');
 const guidelineBaseWidth = 375;
@@ -138,7 +139,7 @@ export default function MainScreen() {
             data={displayedCoins}
             keyExtractor={(coin) => coin.id}
             renderItem={renderCoin}
-            ListEmptyComponent={<Text style={styles.emptyText}>No coin data found.</Text>}
+            ListEmptyComponent={<Text style={styles.emptyText}>{Texts.noCoins}</Text>}
           />
         </View>
       ) : (

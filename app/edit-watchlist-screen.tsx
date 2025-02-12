@@ -18,6 +18,7 @@ import { AppDispatch, RootState } from '@/app/redux/store';
 import { updateWatchlist } from '@/app/redux/slices/watchlistsSlice';
 import { clearTempWatchlist } from '@/app/redux/slices/tempWatchlistsSlice';
 import Colors from '@/app/constants/Colors';
+import { Texts } from './constants/Texts';
 
 const { width } = Dimensions.get('window');
 const guidelineBaseWidth = 375;
@@ -200,7 +201,7 @@ export default function EditWatchlistScreen() {
             keyExtractor={(item) => item.data.id}
             renderItem={renderCoinRow}
             onDragEnd={({ data }) => setLocalCoins(data)}
-            ListEmptyComponent={<Text style={styles.emptyText}>No coins added.</Text>}
+            ListEmptyComponent={<Text style={styles.emptyText}>{Texts.noCoins}</Text>}
           />
         </View>
         <View style={{ flex: 1 }}>
