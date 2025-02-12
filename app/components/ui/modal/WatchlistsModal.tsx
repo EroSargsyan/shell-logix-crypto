@@ -1,8 +1,22 @@
-import { View, Text, Modal, Pressable, StyleSheet, FlatList, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  Modal,
+  Pressable,
+  StyleSheet,
+  FlatList,
+  Alert,
+  Dimensions,
+} from 'react-native';
+import { useSelector } from 'react-redux';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { IWatchlistItem, IWatchlistsModalProps } from '@/app/types/types';
-import { useSelector } from 'react-redux';
 import { RootState } from '@/app/redux/store';
+import Colors from '@/app/constants/Colors';
+
+const { width } = Dimensions.get('window');
+const guidelineBaseWidth = 375;
+const scale = (size: number) => (width / guidelineBaseWidth) * size;
 
 export default function WatchlistsModal({
   visible,
@@ -33,27 +47,28 @@ export default function WatchlistsModal({
   const renderItem = ({ item }: { item: IWatchlistItem }) => {
     const isSelected = item.id === selectedWatchlistId;
     return (
-      //TODO add ... to the end of the name if it's too long
       <View style={styles.itemRow}>
         <Pressable style={styles.itemContainer} onPress={() => onSelectWatchlist(item.id)}>
           <View style={styles.iconWrapper}>
-            <Ionicons name={item.icon} size={34} color="#8e44ad" />
+            <Ionicons name={item.icon} size={scale(40)} color={Colors.primary} />
           </View>
-
           <View style={{ flex: 1 }}>
-            <Text style={styles.itemTitle}>{item.name}</Text>
+            <Text style={styles.itemTitle} numberOfLines={1} ellipsizeMode="tail">
+              {item.name}
+            </Text>
             <Text style={styles.itemSubtitle}>{item.coinCount} Coin(s)</Text>
           </View>
-
-          {isSelected && <Text style={styles.checkmark}>✔</Text>}
         </Pressable>
-
-        <Pressable style={styles.iconButton} onPress={() => onEditWatchlist(item.id)}>
-          <Ionicons name="create-outline" size={20} color="#8e44ad" />
+        <View style={styles.actionButton}>
+          {isSelected && (
+            <Ionicons name="checkmark-outline" size={scale(24)} color={Colors.primary} />
+          )}
+        </View>
+        <Pressable style={styles.actionButton} onPress={() => onEditWatchlist(item.id)}>
+          <Ionicons name="create-outline" size={scale(24)} color={Colors.primary} />
         </Pressable>
-
-        <Pressable style={styles.iconButton} onPress={() => handleDeletePress(item.id)}>
-          <Ionicons name="trash-outline" size={20} color="red" />
+        <Pressable style={styles.actionButton} onPress={() => handleDeletePress(item.id)}>
+          <Ionicons name="trash-outline" size={scale(24)} color="red" />
         </Pressable>
       </View>
     );
@@ -70,14 +85,12 @@ export default function WatchlistsModal({
               <Text style={styles.editText}>Done</Text>
             </Pressable>
           </View>
-
           <FlatList
             data={watchlists}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
             style={styles.flatList}
           />
-
           <Pressable onPress={onCreateNew} style={styles.newWatchlistButton}>
             <Text style={styles.newWatchlistText}>+ New Watchlist</Text>
           </Pressable>
@@ -93,44 +106,90 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     backgroundColor: 'rgba(0,0,0,0.2)',
   },
-  overlayTouchable: { flex: 1 },
+
+  overlayTouchable: {
+    flex: 1,
+  },
+
   modalContainer: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    backgroundColor: Colors.cardBackground,
+    borderTopLeftRadius: scale(24),
+    borderTopRightRadius: scale(24),
+    paddingVertical: scale(16),
+    paddingHorizontal: scale(20),
     maxHeight: '60%',
   },
+
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: scale(12),
   },
-  headerTitle: { fontSize: 17, fontWeight: '600', color: '#000' },
-  editText: { fontSize: 16, color: '#8e44ad', fontWeight: '500' },
-  flatList: { flexGrow: 0, marginBottom: 8 },
+
+  headerTitle: {
+    fontSize: scale(20),
+    fontWeight: '600',
+    color: Colors.text,
+  },
+
+  editText: {
+    fontSize: scale(16),
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+
+  flatList: {
+    flexGrow: 0,
+    marginBottom: scale(8),
+  },
+
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: scale(10),
   },
+
   iconWrapper: {
-    width: 40,
-    height: 40,
+    width: scale(50),
+    height: scale(50),
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: scale(12),
   },
-  itemTitle: { fontSize: 15, fontWeight: '500', color: '#000' },
-  itemSubtitle: { fontSize: 13, color: '#777' },
-  checkmark: { fontSize: 18, color: '#8e44ad', fontWeight: '600', marginLeft: 8 },
-  iconButton: { padding: 8 },
-  newWatchlistButton: { paddingVertical: 10 },
-  newWatchlistText: { fontSize: 16, color: '#8e44ad', fontWeight: '600' },
+
+  itemTitle: {
+    fontSize: scale(15),
+    fontWeight: '500',
+    color: Colors.text,
+  },
+
+  itemSubtitle: {
+    fontSize: scale(13),
+    color: Colors.text,
+    opacity: 0.7,
+  },
+
+  actionButton: {
+    width: scale(50),
+    height: scale(50),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  newWatchlistButton: {
+    paddingVertical: scale(10),
+    alignItems: 'center',
+  },
+
+  newWatchlistText: {
+    fontSize: scale(16),
+    color: Colors.primary,
+    fontWeight: '600',
+  },
 });
