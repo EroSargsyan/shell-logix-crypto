@@ -7,6 +7,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Dimensions,
+  Image,
 } from 'react-native';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -117,11 +118,16 @@ export default function EditWatchlistScreen() {
           ]}
         >
           <View style={styles.coinInfo}>
-            <Text style={styles.coinSymbol}>{item.data.symbol.toUpperCase()}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Image source={{ uri: item.data.image }} style={styles.coinImage} />
+              <View style={{ flexDirection: 'column' }}>
+                <Text style={styles.coinSymbol}>{item.data.symbol.toUpperCase()}</Text>
 
-            <Text style={styles.coinName} numberOfLines={1} ellipsizeMode="tail">
-              {item.data.name}
-            </Text>
+                <Text style={styles.coinName} numberOfLines={1} ellipsizeMode="tail">
+                  {item.data.name}
+                </Text>
+              </View>
+            </View>
           </View>
           <View style={styles.rowActions}>
             <Pressable onPress={() => toggleCoinSelection(item.data.id)} style={styles.selectBtn}>
@@ -302,5 +308,12 @@ const styles = StyleSheet.create({
     fontSize: scale(16),
     fontWeight: '600',
     color: Colors.cardBackground,
+  },
+
+  coinImage: {
+    width: scale(24),
+    height: scale(24),
+    marginRight: scale(8),
+    borderRadius: scale(12),
   },
 });
