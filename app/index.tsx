@@ -1,29 +1,45 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Button, FlatList } from 'react-native';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppDispatch, RootState } from './redux/store';
-import { deleteWatchlist } from './redux/slices/watchlistsSlice';
+import {
+  clearSelectedWatchlistId,
+  deleteWatchlist,
+  setSelectedWatchlistId,
+} from './redux/slices/watchlistsSlice';
 import WatchlistsModal from './components/ui/modal/WatchlistsModal';
-import { ICoin, IWatchlist } from '@/app/types/types';
+import { ICoin } from '@/app/types/types';
 
 export default function MainScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const watchlists = useSelector((state: RootState) => state.watchlists.items);
   const { items: allCoins } = useSelector((state: RootState) => state.coins);
+  const selectedWatchlistId = useSelector(
+    (state: RootState) => state.watchlists.selectedWatchlistId,
+  );
 
   const [isModalVisible, setModalVisible] = useState(false);
-  const [selectedWatchlist, setSelectedWatchlist] = useState<IWatchlist | null>(null);
+  const [displayedCoins, setDisplayedCoins] = useState<ICoin[]>([]);
 
-  const displayedCoins = useMemo(() => {
-    if (!selectedWatchlist) return [];
+  const selectedWatchlist = useMemo(() => {
+    return watchlists.find((w) => w.id === selectedWatchlistId) || null;
+  }, [watchlists, selectedWatchlistId]);
+
+  useEffect(() => {
+    if (!selectedWatchlist || !allCoins) {
+      return;
+    }
+    console.log('useEffect');
+
     const watchlistCoinIds = new Set(selectedWatchlist.coins.map((c) => c.id));
-    return allCoins.filter((coin) => watchlistCoinIds.has(coin.id));
+    const filteredCoins = allCoins.filter((coin) => watchlistCoinIds.has(coin.id));
+    setDisplayedCoins(filteredCoins);
   }, [selectedWatchlist, allCoins]);
 
   const handleSelectWatchlist = (watchlistId: string) => {
-    setSelectedWatchlist(watchlists?.find((w) => w.id === watchlistId) || null);
+    dispatch(setSelectedWatchlistId(watchlistId));
     setModalVisible(false);
   };
 
@@ -42,7 +58,13 @@ export default function MainScreen() {
     setModalVisible(false);
 
     if (selectedWatchlist?.id === watchlistId) {
-      setSelectedWatchlist(watchlists.length - 1 ? watchlists[0] : null);
+      const remaining = watchlists.filter((w) => w.id !== watchlistId);
+
+      if (remaining.length) {
+        dispatch(setSelectedWatchlistId(remaining[0].id));
+      } else {
+        dispatch(clearSelectedWatchlistId());
+      }
     }
   };
 

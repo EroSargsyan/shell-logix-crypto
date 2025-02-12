@@ -61,8 +61,10 @@ export default function AddCoinsScreen() {
   }, [searchText]);
 
   useEffect(() => {
-    dispatch(getCoinsMarkets());
-  }, [dispatch]);
+    if (!allCoins.length && status === 'idle') {
+      dispatch(getCoinsMarkets());
+    }
+  }, [dispatch, allCoins.length, status]);
 
   if (status === 'loading') {
     return (

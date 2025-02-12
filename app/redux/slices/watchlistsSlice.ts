@@ -3,12 +3,21 @@ import { ICoin, IWatchlistsState } from '@/app/types/types';
 
 const initialState: IWatchlistsState = {
   items: [],
+  selectedWatchlistId: null,
 };
 
 const watchlistsSlice = createSlice({
   name: 'watchlists',
   initialState,
   reducers: {
+    setSelectedWatchlistId: (state, action: PayloadAction<string>) => {
+      state.selectedWatchlistId = action.payload;
+    },
+
+    clearSelectedWatchlistId: (state) => {
+      state.selectedWatchlistId = null;
+    },
+
     createWatchlist: (
       state,
       action: PayloadAction<{
@@ -55,5 +64,11 @@ const watchlistsSlice = createSlice({
   },
 });
 
-export const { createWatchlist, updateWatchlist, deleteWatchlist } = watchlistsSlice.actions;
+export const {
+  createWatchlist,
+  updateWatchlist,
+  deleteWatchlist,
+  setSelectedWatchlistId,
+  clearSelectedWatchlistId,
+} = watchlistsSlice.actions;
 export default watchlistsSlice.reducer;
