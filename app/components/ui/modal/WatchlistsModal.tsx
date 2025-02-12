@@ -1,17 +1,23 @@
 import { View, Text, Modal, Pressable, StyleSheet, FlatList, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { IWatchlistItem, IWatchlistsModalProps } from '@/app/types/types';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/redux/store';
 
 export default function WatchlistsModal({
   visible,
   onClose,
-  watchlists,
-  selectedWatchlistId,
   onSelectWatchlist,
   onCreateNew,
   onEditWatchlist,
   onDeleteWatchlist,
 }: IWatchlistsModalProps) {
+  const watchlists = useSelector((state: RootState) => state.watchlists.items);
+
+  const selectedWatchlistId = useSelector(
+    (state: RootState) => state.watchlists.selectedWatchlistId,
+  );
+
   const handleDeletePress = (watchlistId: string) => {
     Alert.alert(
       'Delete Watchlist',
@@ -27,6 +33,7 @@ export default function WatchlistsModal({
   const renderItem = ({ item }: { item: IWatchlistItem }) => {
     const isSelected = item.id === selectedWatchlistId;
     return (
+      //TODO add ... to the end of the name if it's too long
       <View style={styles.itemRow}>
         <Pressable style={styles.itemContainer} onPress={() => onSelectWatchlist(item.id)}>
           <View style={styles.iconWrapper}>
