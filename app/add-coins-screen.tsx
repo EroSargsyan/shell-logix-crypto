@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Image,
+  Dimensions,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,6 +17,12 @@ import { AppDispatch, RootState } from '@/app/redux/store';
 import { getCoinsMarkets } from '@/app/redux/slices/coinsSlice';
 import { setTempWatchlist } from '@/app/redux/slices/tempWatchlistsSlice';
 import { ICoin } from '@/app/types/types';
+import Colors from '@/app/constants/Colors';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
+const { width } = Dimensions.get('window');
+const guidelineBaseWidth = 375;
+const scale = (size: number) => (width / guidelineBaseWidth) * size;
 
 export default function AddCoinsScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -34,7 +41,6 @@ export default function AddCoinsScreen() {
   const tempCoins = useSelector((state: RootState) => state.tempWatchlists.tempWatchlist);
   const initialSelectedIds = tempCoins?.map((coin: ICoin) => coin.id) || [];
   const [selectedCoinIds, setSelectedCoinIds] = useState<string[]>(initialSelectedIds);
-
   const [searchText, setSearchText] = useState('');
   const [filteredCoins, setFilteredCoins] = useState<ICoin[]>([]);
 
@@ -69,7 +75,7 @@ export default function AddCoinsScreen() {
   if (status === 'loading') {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#8e44ad" />
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
@@ -92,29 +98,38 @@ export default function AddCoinsScreen() {
             <Text style={styles.name}>{item.name}</Text>
           </View>
         </View>
-        <Pressable style={styles.addBtn} onPress={() => toggleCoin(item.id)}>
-          <Text style={{ color: isSelected ? '#888' : '#8e44ad' }}>{isSelected ? '✔' : '+'}</Text>
-        </Pressable>
+        <View style={styles.rowActions}>
+          <Pressable onPress={() => toggleCoin(item.id)} style={styles.selectBtn}>
+            {isSelected ? (
+              <Ionicons name="checkmark-circle" size={scale(30)} color={Colors.primary} />
+            ) : (
+              <Ionicons name="add-circle-outline" size={scale(30)} color={Colors.primary} />
+            )}
+          </Pressable>
+        </View>
       </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={styles.cancelText}>Cancel</Text>
-        </Pressable>
         <Text style={styles.title}>Add Coins</Text>
-        <Pressable onPress={handleDonePress}>
-          <Text style={styles.doneText}>Done</Text>
-        </Pressable>
+        <View style={styles.actionRow}>
+          <Pressable onPress={() => router.back()} style={styles.actionButton}>
+            <Text style={styles.actionText}>Cancel</Text>
+          </Pressable>
+
+          <Pressable onPress={handleDonePress} style={styles.actionButton}>
+            <Text style={styles.actionText}>Done</Text>
+          </Pressable>
+        </View>
       </View>
 
       <TextInput
         style={styles.searchInput}
         placeholder="Search coins..."
+        placeholderTextColor={Colors.text}
         onChangeText={setSearchText}
         value={searchText}
       />
@@ -125,37 +140,110 @@ export default function AddCoinsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+    paddingVertical: scale(20),
+  },
+
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  cancelText: { fontSize: 16, color: '#666' },
-  title: { fontSize: 16, fontWeight: '600' },
-  doneText: { fontSize: 16, color: '#8e44ad' },
-  searchInput: {
-    margin: 16,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
+
+  header: {
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(12),
+    backgroundColor: Colors.cardBackground,
   },
+
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingVertical: scale(12),
+  },
+
+  actionButton: {
+    paddingVertical: scale(8),
+    paddingHorizontal: scale(12),
+  },
+
+  actionText: {
+    fontSize: scale(16),
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+
+  title: {
+    fontSize: scale(20),
+    fontWeight: '600',
+    color: Colors.text,
+    textAlign: 'center',
+  },
+
+  searchInput: {
+    margin: scale(16),
+    padding: scale(12),
+    borderWidth: scale(1),
+    borderColor: Colors.border,
+    borderRadius: scale(8),
+    fontSize: scale(16),
+    color: Colors.text,
+    backgroundColor: Colors.cardBackground,
+  },
+
   coinRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#eee',
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(12),
+    borderBottomWidth: scale(0.5),
+    borderBottomColor: Colors.border,
   },
-  coinInfo: { flexDirection: 'row', alignItems: 'center' },
-  coinImage: { width: 32, height: 32, marginRight: 12, borderRadius: 16 },
-  symbol: { fontSize: 16, fontWeight: '500' },
-  name: { fontSize: 12, color: '#666' },
-  addBtn: { padding: 8 },
+
+  coinInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  coinImage: {
+    width: scale(32),
+    height: scale(32),
+    marginRight: scale(12),
+    borderRadius: scale(16),
+  },
+
+  symbol: {
+    fontSize: scale(16),
+    fontWeight: '500',
+    color: Colors.text,
+  },
+
+  name: {
+    fontSize: scale(12),
+    color: Colors.text,
+  },
+
+  rowActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  selectBtn: {
+    marginRight: scale(12),
+    padding: scale(8),
+  },
+
+  addBtn: {
+    padding: scale(8),
+  },
+
+  addBtnText: {
+    fontSize: scale(16),
+    color: Colors.primary,
+    fontWeight: '600',
+  },
 });
