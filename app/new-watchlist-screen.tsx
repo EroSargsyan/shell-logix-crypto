@@ -8,7 +8,6 @@ import {
   SafeAreaView,
   FlatList,
   Image,
-  Modal,
 } from 'react-native';
 import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -18,6 +17,12 @@ import { clearTempWatchlist } from './redux/slices/tempWatchlistsSlice';
 import { createWatchlist } from './redux/slices/watchlistsSlice';
 import { availableIcons } from './constants/Icons';
 import IconSelectionModal from './components/ui/modal/IconSelectionModal';
+import Colors from './constants/Colors';
+import { Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
+const guidelineBaseWidth = 375;
+const scale = (size: number) => (width / guidelineBaseWidth) * size;
 
 export default function NewWatchlistScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -66,30 +71,34 @@ export default function NewWatchlistScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={handleCancelPress}>
-          <Text style={styles.cancelText}>Cancel</Text>
-        </Pressable>
         <Text style={styles.title}>New Watchlist</Text>
-        <Pressable onPress={handleCreatePress}>
-          <Text style={[styles.createText, !watchlistName && { opacity: 0.5 }]}>Create</Text>
+      </View>
+      <View style={styles.actionRow}>
+        <Pressable onPress={handleCancelPress} style={styles.actionButton}>
+          <Text style={styles.actionText}>Cancel</Text>
+        </Pressable>
+
+        <Pressable onPress={handleCreatePress} style={styles.actionButton}>
+          <Text style={styles.actionText}>Create</Text>
         </Pressable>
       </View>
 
       <View style={styles.body}>
         <Pressable onPress={() => setIconModalVisible(true)} style={styles.avatarContainer}>
-          <Ionicons name={selectedIcon} size={60} color="#8e44ad" />
+          <Ionicons name={selectedIcon} size={scale(60)} color={Colors.primary} />
         </Pressable>
-
         <TextInput
           style={styles.nameInput}
           placeholder="Watchlist Name"
+          placeholderTextColor={Colors.text}
           value={watchlistName}
           onChangeText={handleNameChange}
+          multiline
+          scrollEnabled
         />
 
-        {tempWatchlist.length > 0 && (
+        <View style={styles.flatListContainer}>
           <FlatList
-            style={{ marginTop: 16 }}
             data={tempWatchlist}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -97,16 +106,18 @@ export default function NewWatchlistScreen() {
                 <Image source={{ uri: item.image }} style={styles.coinImage} />
                 <View>
                   <Text style={styles.symbol}>{item.symbol.toUpperCase()}</Text>
-                  <Text style={styles.name}>{item.name}</Text>
+                  <Text style={styles.coinName}>{item.name}</Text>
                 </View>
               </View>
             )}
           />
-        )}
+        </View>
 
-        <Pressable style={styles.addCoinsBtn} onPress={handleAddCoinsPress}>
-          <Text style={styles.addCoinsText}>+ Add Coins</Text>
-        </Pressable>
+        <View style={{ flex: 1 }}>
+          <Pressable style={styles.addCoinsBtn} onPress={handleAddCoinsPress}>
+            <Text style={styles.addCoinsText}>+ Add Coins</Text>
+          </Pressable>
+        </View>
       </View>
 
       <IconSelectionModal
@@ -120,68 +131,123 @@ export default function NewWatchlistScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+    paddingVertical: scale(20),
+  },
   header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(12),
+    backgroundColor: Colors.cardBackground,
   },
 
-  cancelText: { fontSize: 16, color: '#8e44ad' },
+  title: {
+    fontSize: scale(18),
+    fontWeight: '600',
+    color: Colors.text,
+    textAlign: 'center',
+  },
 
-  title: { fontSize: 16, fontWeight: '600', color: '#000' },
+  body: {
+    flex: 1,
+    paddingHorizontal: scale(16),
+    alignItems: 'center',
+    paddingBottom: scale(16),
+  },
 
-  createText: { fontSize: 16, color: '#8e44ad' },
-
-  body: { flex: 1, padding: 24, alignItems: 'center' },
-
+  avatarRow: {
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: scale(16),
+  },
   avatarContainer: {
-    width: 80,
-    height: 80,
+    width: scale(70),
+    height: scale(70),
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#eee',
-    borderRadius: 40,
-    marginBottom: 16,
+    backgroundColor: Colors.cardBackground,
+    borderRadius: scale(30),
+  },
+
+  addCoinsBtn: {
+    marginTop: scale(16),
+    alignSelf: 'center',
+    paddingVertical: scale(12),
+    paddingHorizontal: scale(24),
+    backgroundColor: Colors.primary,
+    borderRadius: scale(8),
+  },
+
+  addCoinsText: {
+    fontSize: scale(16),
+    fontWeight: '600',
+    color: Colors.cardBackground,
   },
 
   nameInput: {
     width: '80%',
-    padding: 12,
+    maxHeight: scale(60),
+    padding: scale(12),
+    marginVertical: scale(12),
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    marginBottom: 24,
-    fontSize: 16,
+    alignSelf: 'center',
+    borderColor: Colors.border,
+    borderRadius: scale(8),
+    fontSize: scale(16),
+    textAlign: 'center',
+    color: Colors.text,
+    backgroundColor: Colors.cardBackground,
   },
-
-  addCoinsBtn: {
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: '#eee',
+  flatListContainer: {
+    flex: 5,
+    marginTop: scale(16),
+    width: '100%',
   },
-
-  addCoinsText: {
-    fontSize: 16,
-    color: '#8e44ad',
-    fontWeight: '500',
-  },
-
   coinRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#ddd',
-    width: 300,
+    padding: scale(8),
+    borderBottomWidth: scale(0.5),
+    borderBottomColor: Colors.border,
+    width: '100%',
+  },
+  coinImage: {
+    width: scale(24),
+    height: scale(24),
+    marginRight: scale(8),
+    borderRadius: scale(12),
+  },
+  symbol: {
+    fontSize: scale(14),
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  coinName: {
+    fontSize: scale(12),
+    color: Colors.text,
   },
 
-  coinImage: { width: 32, height: 32, marginRight: 12, borderRadius: 16 },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingVertical: scale(12),
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    marginBottom: scale(16),
+    backgroundColor: Colors.cardBackground,
+  },
 
-  symbol: { fontSize: 16, fontWeight: '500' },
+  actionButton: {
+    paddingVertical: scale(8),
+    paddingHorizontal: scale(12),
+  },
 
-  name: { fontSize: 12, color: '#666' },
+  actionText: {
+    fontSize: scale(16),
+    color: Colors.primary,
+    fontWeight: '600',
+  },
 });
