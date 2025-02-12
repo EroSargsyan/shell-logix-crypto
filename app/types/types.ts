@@ -48,8 +48,6 @@ export interface ICoinsState {
 export interface IWatchlistsModalProps {
   visible: boolean;
   onClose: () => void;
-  watchlists: IWatchlistItem[];
-  selectedWatchlistId?: string;
   onSelectWatchlist: (id: string) => void;
   onCreateNew: () => void;
   onEditWatchlist: (id: string) => void;
@@ -66,12 +64,11 @@ export interface IWatchlist {
 
 export interface IWatchlistsState {
   items: IWatchlist[];
-  // selectedWatchlistId: string | null;
+  selectedWatchlistId: string | null;
 }
 
 export interface ITempWatchlistState {
-  icon: string;
-  selectedCoins: ICoin[];
+  tempWatchlist: ICoin[];
 }
 
 export interface IIconSelectionModalProps {
