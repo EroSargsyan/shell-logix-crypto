@@ -37,13 +37,13 @@ export default function EditWatchlistScreen() {
     state.watchlists.items.find((w) => w.id === watchlistId),
   ) as IWatchlist | undefined;
 
-  const [name, setName] = useState('');
+  const [watchlistName, setWatchlistName] = useState('');
   const [localCoins, setLocalCoins] = useState<LocalCoin[]>([]);
   const [isEditOrderMode, setIsEditOrderMode] = useState(false);
 
   useEffect(() => {
     if (watchlist) {
-      setName(watchlist.name);
+      setWatchlistName(watchlist.name);
       setLocalCoins(
         watchlist.coins.map((c, i) => ({
           data: { ...c },
@@ -83,15 +83,16 @@ export default function EditWatchlistScreen() {
   );
 
   const handleDonePress = () => {
-    if (!name.trim() || !watchlist) {
+    if (!watchlistName.trim() || !watchlist) {
       return;
     }
+
     const finalCoins = localCoins.filter((item) => item.selected).map((item) => item.data);
 
     dispatch(
       updateWatchlist({
         watchlistId: watchlist.id,
-        newName: name,
+        newName: watchlistName,
         newCoins: finalCoins,
       }),
     );
@@ -158,11 +159,23 @@ export default function EditWatchlistScreen() {
         <Pressable onPress={handleCancelPress} style={styles.actionButton}>
           <Text style={styles.actionText}>Cancel</Text>
         </Pressable>
-        <Pressable onPress={() => setIsEditOrderMode((prev) => !prev)} style={styles.actionButton}>
-          <Text style={styles.actionText}>{isEditOrderMode ? 'Finish Editing' : 'Edit Order'}</Text>
+        <Pressable
+          onPress={() => setIsEditOrderMode((prev) => !prev)}
+          style={styles.actionButton}
+          disabled={localCoins.length <= 1}
+        >
+          <Text style={[styles.actionText, localCoins.length <= 1 && styles.disabledText]}>
+            {isEditOrderMode ? 'Finish Editing' : 'Edit Order'}
+          </Text>
         </Pressable>
-        <Pressable onPress={handleDonePress} style={styles.actionButton}>
-          <Text style={styles.actionText}>Done</Text>
+        <Pressable
+          onPress={handleDonePress}
+          style={styles.actionButton}
+          disabled={!watchlistName.trim()}
+        >
+          <Text style={[styles.actionText, !watchlistName.trim() && styles.disabledText]}>
+            Done
+          </Text>
         </Pressable>
       </View>
       <View style={styles.body}>
@@ -176,9 +189,9 @@ export default function EditWatchlistScreen() {
           placeholder="Watchlist Name"
           multiline
           scrollEnabled
-          placeholderTextColor={Colors.text}
-          value={name}
-          onChangeText={setName}
+          placeholderTextColor={Colors.placeholderText}
+          value={watchlistName}
+          onChangeText={setWatchlistName}
         />
         <View style={{ flex: 5 }}>
           <DraggableFlatList
@@ -187,6 +200,7 @@ export default function EditWatchlistScreen() {
             keyExtractor={(item) => item.data.id}
             renderItem={renderCoinRow}
             onDragEnd={({ data }) => setLocalCoins(data)}
+            ListEmptyComponent={<Text style={styles.emptyText}>No coins added.</Text>}
           />
         </View>
         <View style={{ flex: 1 }}>
@@ -315,5 +329,14 @@ const styles = StyleSheet.create({
     height: scale(24),
     marginRight: scale(8),
     borderRadius: scale(12),
+  },
+
+  disabledText: {
+    color: Colors.disabledText,
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: Colors.text,
   },
 });
