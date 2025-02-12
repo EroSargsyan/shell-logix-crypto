@@ -26,6 +26,7 @@ export default function EditWatchlistScreen() {
 
   const [name, setName] = useState('');
   const [localCoins, setLocalCoins] = useState<LocalCoin[]>([]);
+  const [isEditOrderMode, setIsEditOrderMode] = useState(false);
 
   useEffect(() => {
     if (watchlist) {
@@ -96,12 +97,9 @@ export default function EditWatchlistScreen() {
   const renderCoinRow = useCallback(
     ({ item, drag, isActive }: RenderItemParams<LocalCoin>) => {
       const isSelected = item.selected;
+
       return (
-        <Pressable
-          onPress={drag}
-          disabled={isActive}
-          style={[styles.coinRow, { backgroundColor: isActive ? '#f0f0f0' : '#fff' }]}
-        >
+        <View style={[styles.coinRow, { backgroundColor: isActive ? '#f0f0f0' : '#fff' }]}>
           <View>
             <Text style={styles.coinSymbol}>{item.data.symbol.toUpperCase()}</Text>
             <Text style={styles.coinName}>{item.data.name}</Text>
@@ -112,14 +110,17 @@ export default function EditWatchlistScreen() {
                 {isSelected ? '✔' : '+'}
               </Text>
             </Pressable>
-            <Pressable onLongPress={drag} style={styles.dragHandle}>
-              <Ionicons name="reorder-three-outline" size={24} color="#8e44ad" />
-            </Pressable>
+
+            {isEditOrderMode && (
+              <Pressable onPressIn={isEditOrderMode ? drag : undefined} style={styles.dragHandle}>
+                <Ionicons name="reorder-three-outline" size={24} color="#8e44ad" />
+              </Pressable>
+            )}
           </View>
-        </Pressable>
+        </View>
       );
     },
-    [toggleCoinSelection],
+    [toggleCoinSelection, isEditOrderMode],
   );
 
   return (
@@ -135,6 +136,11 @@ export default function EditWatchlistScreen() {
       </View>
 
       <View style={styles.body}>
+        <Pressable onPress={() => setIsEditOrderMode((prev) => !prev)}>
+          <Text style={styles.editOrderText}>
+            {isEditOrderMode ? 'Finish Editing' : 'Edit Order'}
+          </Text>
+        </Pressable>
         {watchlist && (
           <View style={styles.watchlistIconContainer}>
             <Ionicons name={watchlist.icon as any} size={50} color="#8e44ad" />
@@ -150,6 +156,7 @@ export default function EditWatchlistScreen() {
 
         <DraggableFlatList
           data={localCoins}
+          activationDistance={isEditOrderMode ? 5 : 1000}
           keyExtractor={(item) => item.data.id}
           renderItem={renderCoinRow}
           onDragEnd={({ data }) => setLocalCoins(data)}
@@ -235,5 +242,11 @@ const styles = StyleSheet.create({
 
   dragHandle: {
     padding: 8,
+  },
+
+  editOrderText: {
+    fontSize: 16,
+    color: '#8e44ad',
+    fontWeight: '600',
   },
 });
