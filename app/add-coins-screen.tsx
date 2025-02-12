@@ -14,7 +14,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/app/redux/store';
 import { getCoinsMarkets } from '@/app/redux/slices/coinsSlice';
-import { setSelectedCoins } from '@/app/redux/slices/tempWatchlistsSlice';
+import { setTempWatchlist } from '@/app/redux/slices/tempWatchlistsSlice';
 import { ICoin } from '@/app/types/types';
 
 export default function AddCoinsScreen() {
@@ -31,7 +31,7 @@ export default function AddCoinsScreen() {
   }
 
   const { items: allCoins, status, error } = useSelector((state: RootState) => state.coins);
-  const tempCoins = useSelector((state: RootState) => state.tempWatchlists.selectedCoins);
+  const tempCoins = useSelector((state: RootState) => state.tempWatchlists.tempWatchlist);
   const initialSelectedIds = tempCoins?.map((coin: ICoin) => coin.id) || [];
   const [selectedCoinIds, setSelectedCoinIds] = useState<string[]>(initialSelectedIds);
 
@@ -46,7 +46,7 @@ export default function AddCoinsScreen() {
 
   const handleDonePress = () => {
     const selectedCoins = allCoins.filter((coin) => selectedCoinIds.includes(coin.id));
-    dispatch(setSelectedCoins(selectedCoins));
+    dispatch(setTempWatchlist(selectedCoins));
     router.back();
   };
 
@@ -61,10 +61,8 @@ export default function AddCoinsScreen() {
   }, [searchText]);
 
   useEffect(() => {
-    if (allCoins.length === 0 && status === 'idle') {
-      dispatch(getCoinsMarkets());
-    }
-  }, [dispatch, allCoins.length, status]);
+    dispatch(getCoinsMarkets());
+  }, [dispatch]);
 
   if (status === 'loading') {
     return (

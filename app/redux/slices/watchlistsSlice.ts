@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ICoin, IWatchlist, IWatchlistsState } from '@/app/types/types';
+import { ICoin, IWatchlistsState } from '@/app/types/types';
 
 const initialState: IWatchlistsState = {
   items: [],
@@ -48,6 +48,7 @@ const watchlistsSlice = createSlice({
         watchlist.coinCount = newCoins.length;
       }
     },
+
     deleteWatchlist: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter((watchlist) => watchlist.id !== action.payload);
     },

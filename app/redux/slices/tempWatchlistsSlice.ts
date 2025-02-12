@@ -2,25 +2,23 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ICoin, ITempWatchlistState } from '@/app/types/types';
 
 const initialState: ITempWatchlistState = {
-  icon: '🦄',
-  selectedCoins: [],
+  tempWatchlist: [],
 };
 
 const tempWatchlistSlice = createSlice({
   name: 'tempWatchlist',
   initialState,
   reducers: {
-    setSelectedCoins: (state, action: PayloadAction<ICoin[]>) => {
-      state.selectedCoins = action.payload;
+    setTempWatchlist: (state, action: PayloadAction<ICoin[]>) => {
+      state.tempWatchlist = action.payload;
     },
 
     clearTempWatchlist: (state) => {
-      state.icon = '🦄';
-      state.selectedCoins = [];
+      state.tempWatchlist = [];
     },
   },
 });
 
-export const { setSelectedCoins, clearTempWatchlist } = tempWatchlistSlice.actions;
+export const { setTempWatchlist, clearTempWatchlist } = tempWatchlistSlice.actions;
 
 export default tempWatchlistSlice.reducer;

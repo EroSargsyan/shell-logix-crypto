@@ -21,7 +21,7 @@ import IconSelectionModal from './components/ui/modal/IconSelectionModal';
 
 export default function NewWatchlistScreen() {
   const dispatch = useDispatch<AppDispatch>();
-  const { selectedCoins } = useSelector((state: RootState) => state.tempWatchlists);
+  const { tempWatchlist } = useSelector((state: RootState) => state.tempWatchlists);
 
   const [selectedIcon, setSelectedIcon] = useState(availableIcons[0]);
   const [watchlistName, setWatchlistName] = useState('');
@@ -41,7 +41,7 @@ export default function NewWatchlistScreen() {
         id: Date.now().toString(),
         name: watchlistName,
         icon: selectedIcon,
-        coins: selectedCoins,
+        coins: tempWatchlist,
       }),
     );
 
@@ -87,10 +87,10 @@ export default function NewWatchlistScreen() {
           onChangeText={handleNameChange}
         />
 
-        {selectedCoins.length > 0 && (
+        {tempWatchlist.length > 0 && (
           <FlatList
             style={{ marginTop: 16 }}
-            data={selectedCoins}
+            data={tempWatchlist}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={styles.coinRow}>

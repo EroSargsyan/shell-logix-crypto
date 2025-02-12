@@ -1,22 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-  FlatList,
-} from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { View, Text, TextInput, Pressable, StyleSheet, SafeAreaView, FlatList } from 'react-native';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { useFocusEffect } from '@react-navigation/native';
 import { ICoin, IWatchlist } from '@/app/types/types';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppDispatch, RootState } from '@/app/redux/store';
 import { updateWatchlist } from '@/app/redux/slices/watchlistsSlice';
-import { setSelectedCoins } from '@/app/redux/slices/tempWatchlistsSlice';
+import { clearTempWatchlist } from '@/app/redux/slices/tempWatchlistsSlice';
 
 interface LocalCoin {
   data: ICoin;
@@ -72,10 +62,11 @@ export default function EditWatchlistScreen() {
     );
   }, []);
 
-  const tempSelectedCoins = useSelector((state: RootState) => state.tempWatchlists.selectedCoins);
+  const tempSelectedCoins = useSelector((state: RootState) => state.tempWatchlists.tempWatchlist);
+
   useFocusEffect(
     useCallback(() => {
-      if (tempSelectedCoins && tempSelectedCoins.length > 0) {
+      if (tempSelectedCoins?.length) {
         setLocalCoins((prev) => {
           const existingIds = prev.map((item) => item.data.id);
           const newCoins = tempSelectedCoins.filter((coin) => !existingIds.includes(coin.id));
@@ -88,7 +79,7 @@ export default function EditWatchlistScreen() {
           return [...prev, ...newLocalCoins];
         });
 
-        dispatch(setSelectedCoins([]));
+        dispatch(clearTempWatchlist());
       }
     }, [tempSelectedCoins, dispatch]),
   );
