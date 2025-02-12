@@ -77,7 +77,11 @@ Develop a Watchlist Management feature in a React Native application, allowing u
 
    This will install all required packages, including React, React Native, React Navigation, Redux Toolkit, etc.
 
-4. **Run for Android**
+4. **Create a `.env` file**
+
+   - Copy the `.env.example` file to `.env` and fill in the required variables.
+
+5. **Run for Android**
 
    - Ensure you have an Android emulator running or an Android device connected via USB.
    - Run:
@@ -86,7 +90,7 @@ Develop a Watchlist Management feature in a React Native application, allowing u
      ```
      then press "a" button to run on Android
 
-5. **Run for iOS**
+6. **Run for iOS**
 
    - Make sure you have Xcode installed and an iOS simulator running or a physical iOS device connected.
    - Install pods if required:
@@ -99,7 +103,7 @@ Develop a Watchlist Management feature in a React Native application, allowing u
      ```
      then press "i" button to run on iOS
 
-6. **Testing the App**
+7. **Testing the App**
    - Verify watchlist creation, viewing, editing, and deletion.
    - Confirm coin data is fetched in real-time from CoinGecko.
    - Check responsiveness on different screen sizes.
