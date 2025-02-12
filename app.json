@@ -37,6 +37,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "16731220-5769-4a26-9f0b-88b1d1e2bf41"
+      }
     }
   }
 }
