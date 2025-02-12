@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, SafeAreaView, FlatList } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, SafeAreaView } from 'react-native';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
+import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import { ICoin, IWatchlist } from '@/app/types/types';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppDispatch, RootState } from '@/app/redux/store';
@@ -39,23 +40,6 @@ export default function EditWatchlistScreen() {
     }
   }, [watchlist]);
 
-  // TODO use DraggableFlatList
-  const moveItem = useCallback((index: number, direction: 'up' | 'down') => {
-    setLocalCoins((prev) => {
-      const updated = [...prev];
-      if (direction === 'up' && index > 0) {
-        const temp = updated[index].order;
-        updated[index].order = updated[index - 1].order;
-        updated[index - 1].order = temp;
-      } else if (direction === 'down' && index < updated.length - 1) {
-        const temp = updated[index].order;
-        updated[index].order = updated[index + 1].order;
-        updated[index + 1].order = temp;
-      }
-      return updated.sort((a, b) => a.order - b.order);
-    });
-  }, []);
-
   const toggleCoinSelection = useCallback((coinId: string) => {
     setLocalCoins((prev) =>
       prev.map((item) => (item.data.id === coinId ? { ...item, selected: !item.selected } : item)),
@@ -88,11 +72,7 @@ export default function EditWatchlistScreen() {
     if (!name.trim() || !watchlist) {
       return;
     }
-
-    const finalCoins = localCoins
-      .filter((item) => item.selected)
-      .sort((a, b) => a.order - b.order)
-      .map((item) => item.data);
+    const finalCoins = localCoins.filter((item) => item.selected).map((item) => item.data);
 
     dispatch(
       updateWatchlist({
@@ -114,10 +94,14 @@ export default function EditWatchlistScreen() {
   };
 
   const renderCoinRow = useCallback(
-    ({ item, index }: { item: LocalCoin; index: number }) => {
+    ({ item, drag, isActive }: RenderItemParams<LocalCoin>) => {
       const isSelected = item.selected;
       return (
-        <View style={styles.coinRow}>
+        <Pressable
+          onPress={drag}
+          disabled={isActive}
+          style={[styles.coinRow, { backgroundColor: isActive ? '#f0f0f0' : '#fff' }]}
+        >
           <View>
             <Text style={styles.coinSymbol}>{item.data.symbol.toUpperCase()}</Text>
             <Text style={styles.coinName}>{item.data.name}</Text>
@@ -128,19 +112,14 @@ export default function EditWatchlistScreen() {
                 {isSelected ? '✔' : '+'}
               </Text>
             </Pressable>
-            <View style={styles.moveArrows}>
-              <Pressable onPress={() => moveItem(index, 'up')}>
-                <Ionicons name="chevron-up" size={20} color="#8e44ad" />
-              </Pressable>
-              <Pressable onPress={() => moveItem(index, 'down')}>
-                <Ionicons name="chevron-down" size={20} color="#8e44ad" />
-              </Pressable>
-            </View>
+            <Pressable onLongPress={drag} style={styles.dragHandle}>
+              <Ionicons name="reorder-three-outline" size={24} color="#8e44ad" />
+            </Pressable>
           </View>
-        </View>
+        </Pressable>
       );
     },
-    [moveItem, toggleCoinSelection],
+    [toggleCoinSelection],
   );
 
   return (
@@ -169,11 +148,11 @@ export default function EditWatchlistScreen() {
           onChangeText={setName}
         />
 
-        <FlatList
+        <DraggableFlatList
           data={localCoins}
           keyExtractor={(item) => item.data.id}
           renderItem={renderCoinRow}
-          extraData={localCoins}
+          onDragEnd={({ data }) => setLocalCoins(data)}
         />
 
         <Pressable style={styles.addCoinsBtn} onPress={handleAddCoinsPress}>
@@ -252,5 +231,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#8e44ad',
+  },
+
+  dragHandle: {
+    padding: 8,
   },
 });
