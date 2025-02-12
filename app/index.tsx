@@ -41,9 +41,11 @@ export default function MainScreen() {
       return;
     }
 
-    const watchlistCoinIds = new Set(selectedWatchlist.coins.map((c) => c.id));
-    const filteredCoins = allCoins.filter((coin) => watchlistCoinIds.has(coin.id));
-    setDisplayedCoins(filteredCoins);
+    const displayedCoins = selectedWatchlist.coins
+      .map((coinInWatchlist) => allCoins.find((coin) => coin.id === coinInWatchlist.id))
+      .filter((coin): coin is ICoin => Boolean(coin));
+
+    setDisplayedCoins(displayedCoins);
   }, [selectedWatchlist, allCoins]);
 
   const handleSelectWatchlist = (watchlistId: string) => {
