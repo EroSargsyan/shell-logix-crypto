@@ -203,9 +203,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(16),
     paddingVertical: scale(12),
     backgroundColor: Colors.cardBackground,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-    marginBottom: scale(8),
   },
   title: {
     fontSize: scale(20),
