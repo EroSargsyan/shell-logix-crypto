@@ -1,5 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, SafeAreaView } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  SafeAreaView,
+  Dimensions,
+} from 'react-native';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
@@ -8,6 +16,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppDispatch, RootState } from '@/app/redux/store';
 import { updateWatchlist } from '@/app/redux/slices/watchlistsSlice';
 import { clearTempWatchlist } from '@/app/redux/slices/tempWatchlistsSlice';
+import Colors from '@/app/constants/Colors';
+
+const { width } = Dimensions.get('window');
+const guidelineBaseWidth = 375;
+const scale = (size: number) => (width / guidelineBaseWidth) * size;
 
 interface LocalCoin {
   data: ICoin;
@@ -19,7 +32,6 @@ export default function EditWatchlistScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const params = useLocalSearchParams();
   const watchlistId = params?.watchlistId as string | undefined;
-
   const watchlist = useSelector((state: RootState) =>
     state.watchlists.items.find((w) => w.id === watchlistId),
   ) as IWatchlist | undefined;
@@ -97,23 +109,31 @@ export default function EditWatchlistScreen() {
   const renderCoinRow = useCallback(
     ({ item, drag, isActive }: RenderItemParams<LocalCoin>) => {
       const isSelected = item.selected;
-
       return (
-        <View style={[styles.coinRow, { backgroundColor: isActive ? '#f0f0f0' : '#fff' }]}>
-          <View>
+        <View
+          style={[
+            styles.coinRow,
+            { backgroundColor: isActive ? Colors.background : Colors.cardBackground },
+          ]}
+        >
+          <View style={styles.coinInfo}>
             <Text style={styles.coinSymbol}>{item.data.symbol.toUpperCase()}</Text>
-            <Text style={styles.coinName}>{item.data.name}</Text>
+
+            <Text style={styles.coinName} numberOfLines={1} ellipsizeMode="tail">
+              {item.data.name}
+            </Text>
           </View>
           <View style={styles.rowActions}>
             <Pressable onPress={() => toggleCoinSelection(item.data.id)} style={styles.selectBtn}>
-              <Text style={{ color: isSelected ? '#888' : '#8e44ad' }}>
-                {isSelected ? '✔' : '+'}
-              </Text>
+              {isSelected ? (
+                <Ionicons name="checkmark-circle" size={scale(30)} color={Colors.primary} />
+              ) : (
+                <Ionicons name="add-circle-outline" size={scale(30)} color={Colors.primary} />
+              )}
             </Pressable>
-
             {isEditOrderMode && (
-              <Pressable onPressIn={isEditOrderMode ? drag : undefined} style={styles.dragHandle}>
-                <Ionicons name="reorder-three-outline" size={24} color="#8e44ad" />
+              <Pressable onPressIn={drag} style={styles.dragHandle}>
+                <Ionicons name="reorder-three-outline" size={scale(30)} color={Colors.primary} />
               </Pressable>
             )}
           </View>
@@ -126,127 +146,161 @@ export default function EditWatchlistScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={handleCancelPress}>
-          <Text style={styles.cancelText}>Cancel</Text>
-        </Pressable>
         <Text style={styles.title}>Edit Watchlist</Text>
-        <Pressable onPress={handleDonePress}>
-          <Text style={styles.doneText}>Done</Text>
+      </View>
+      <View style={styles.actionRow}>
+        <Pressable onPress={handleCancelPress} style={styles.actionButton}>
+          <Text style={styles.actionText}>Cancel</Text>
+        </Pressable>
+        <Pressable onPress={() => setIsEditOrderMode((prev) => !prev)} style={styles.actionButton}>
+          <Text style={styles.actionText}>{isEditOrderMode ? 'Finish Editing' : 'Edit Order'}</Text>
+        </Pressable>
+        <Pressable onPress={handleDonePress} style={styles.actionButton}>
+          <Text style={styles.actionText}>Done</Text>
         </Pressable>
       </View>
-
       <View style={styles.body}>
-        <Pressable onPress={() => setIsEditOrderMode((prev) => !prev)}>
-          <Text style={styles.editOrderText}>
-            {isEditOrderMode ? 'Finish Editing' : 'Edit Order'}
-          </Text>
-        </Pressable>
         {watchlist && (
           <View style={styles.watchlistIconContainer}>
-            <Ionicons name={watchlist.icon as any} size={50} color="#8e44ad" />
+            <Ionicons name={watchlist.icon as any} size={scale(50)} color={Colors.primary} />
           </View>
         )}
-
         <TextInput
           style={styles.nameInput}
           placeholder="Watchlist Name"
+          placeholderTextColor={Colors.text}
           value={name}
           onChangeText={setName}
         />
-
-        <DraggableFlatList
-          data={localCoins}
-          activationDistance={isEditOrderMode ? 5 : 1000}
-          keyExtractor={(item) => item.data.id}
-          renderItem={renderCoinRow}
-          onDragEnd={({ data }) => setLocalCoins(data)}
-        />
-
-        <Pressable style={styles.addCoinsBtn} onPress={handleAddCoinsPress}>
-          <Text style={styles.addCoinsText}>+ Add Coins</Text>
-        </Pressable>
+        <View style={{ flex: 5 }}>
+          <DraggableFlatList
+            data={localCoins}
+            activationDistance={isEditOrderMode ? scale(5) : scale(1000)}
+            keyExtractor={(item) => item.data.id}
+            renderItem={renderCoinRow}
+            onDragEnd={({ data }) => setLocalCoins(data)}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Pressable style={styles.addCoinsBtn} onPress={handleAddCoinsPress}>
+            <Text style={styles.addCoinsText}>+ Add Coins</Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+    paddingVertical: scale(20),
   },
-
-  cancelText: { fontSize: 16, color: '#8e44ad' },
-
-  title: { fontSize: 16, fontWeight: '600' },
-
-  doneText: { fontSize: 16, color: '#8e44ad' },
-
-  body: { flex: 1, padding: 16 },
-
+  header: {
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(12),
+    backgroundColor: Colors.cardBackground,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    marginBottom: scale(8),
+  },
+  title: {
+    fontSize: scale(20),
+    fontWeight: '600',
+    color: Colors.text,
+    textAlign: 'center',
+  },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingVertical: scale(12),
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    marginBottom: scale(16),
+    backgroundColor: Colors.cardBackground,
+  },
+  actionButton: {
+    paddingVertical: scale(8),
+    paddingHorizontal: scale(12),
+  },
+  actionText: {
+    fontSize: scale(16),
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  body: {
+    flex: 1,
+    paddingHorizontal: scale(16),
+  },
   watchlistIconContainer: {
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: scale(16),
   },
-
   nameInput: {
     alignSelf: 'center',
     width: '80%',
-    padding: 12,
-    marginVertical: 12,
+    padding: scale(12),
+    marginVertical: scale(12),
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    fontSize: 16,
+    borderColor: Colors.border,
+    borderRadius: scale(8),
+    fontSize: scale(16),
     textAlign: 'center',
+    color: Colors.text,
+    backgroundColor: Colors.cardBackground,
   },
 
   coinRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
-    paddingVertical: 8,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#ddd',
+    backgroundColor: Colors.cardBackground,
+    borderRadius: scale(8),
+    paddingHorizontal: scale(12),
+    paddingVertical: scale(12),
+    marginVertical: scale(4),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: scale(2) },
+    shadowOpacity: 0.1,
+    shadowRadius: scale(4),
+    elevation: 3,
   },
-
-  coinSymbol: { fontSize: 16, fontWeight: '600' },
-
-  coinName: { fontSize: 13, color: '#666' },
-
-  rowActions: { flexDirection: 'row', alignItems: 'center' },
-
-  selectBtn: { marginRight: 12 },
-
-  moveArrows: { flexDirection: 'column', justifyContent: 'center' },
-
-  addCoinsBtn: {
-    marginTop: 16,
-    alignSelf: 'center',
-    padding: 12,
-    backgroundColor: '#eee',
-    borderRadius: 8,
+  coinInfo: {
+    flex: 1,
   },
-
-  addCoinsText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#8e44ad',
-  },
-
-  dragHandle: {
-    padding: 8,
-  },
-
-  editOrderText: {
-    fontSize: 16,
-    color: '#8e44ad',
+  coinSymbol: {
+    fontSize: scale(16),
     fontWeight: '600',
+    color: Colors.text,
+  },
+  coinName: {
+    fontSize: scale(14),
+    color: Colors.text,
+    marginTop: scale(4),
+  },
+  rowActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  selectBtn: {
+    marginRight: scale(12),
+    padding: scale(8),
+  },
+  dragHandle: {
+    padding: scale(8),
+  },
+  addCoinsBtn: {
+    marginTop: scale(16),
+    alignSelf: 'center',
+    paddingVertical: scale(12),
+    paddingHorizontal: scale(24),
+    backgroundColor: Colors.primary,
+    borderRadius: scale(8),
+  },
+  addCoinsText: {
+    fontSize: scale(16),
+    fontWeight: '600',
+    color: Colors.cardBackground,
   },
 });
