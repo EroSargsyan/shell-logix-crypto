@@ -6,6 +6,8 @@ const Colors = {
   cardBackground: '#ffffff',
   text: '#333333',
   border: '#dddddd',
+  placeholderText: '#A9A9A9',
+  disabledText: '#A9A9A9',
 };
 
 export default Colors;
