@@ -168,6 +168,8 @@ export default function EditWatchlistScreen() {
         <TextInput
           style={styles.nameInput}
           placeholder="Watchlist Name"
+          multiline
+          scrollEnabled
           placeholderTextColor={Colors.text}
           value={name}
           onChangeText={setName}
@@ -241,6 +243,7 @@ const styles = StyleSheet.create({
   nameInput: {
     alignSelf: 'center',
     width: '80%',
+    maxHeight: scale(60),
     padding: scale(12),
     marginVertical: scale(12),
     borderWidth: 1,
